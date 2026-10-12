@@ -196,6 +196,7 @@
   animation: liquid-drift-3 18s ease-in-out infinite;
 }
 
+
 /* Liquid Glass Panels (Header, Sidebar, Modals, Aside Cart) */
 .liquid-glass-panel {
   background: rgba(255, 255, 255, 0.65) !important;

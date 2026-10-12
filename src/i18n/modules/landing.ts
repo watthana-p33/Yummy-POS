@@ -62,8 +62,22 @@ export const landingTh = {
     "เข้าสู่ระบบ Yummy POS ได้ทันทีผ่านเว็บบราวเซอร์ ไม่ต้องลงโปรแกรมเพิ่ม ใช้งานได้ทุกอุปกรณ์",
   getStartedBtn: "เข้าสู่ระบบเพื่อเริ่มใช้งาน (Sign In)",
   footerDesc:
-    "ระบบ Point of Sale อัจฉริยะสำหรับร้านอาหาร คาเฟ่ และธุรกิจค้าปลีกยุคใหม่",
+    "ระบบ Point of Sale อัจฉริยะสำหรับร้านอาหาร คาเฟ่ และธุรกิจค้าปลีกยุคใหม่ คิดเงินเร็ว คุมสต็อกแม่นยำ วิเคราะห์กำไรเรียลไทม์",
   allRightsReserved: "สงวนลิขสิทธิ์ทั้งหมด",
+  footerNavTitle: "เมนูนำทาง",
+  footerModulesTitle: "ฟังก์ชันระบบ",
+  footerSecurityTitle: "ความปลอดภัย & มาตรฐาน",
+  footerSupportTitle: "อุปกรณ์ & ซัพพอร์ต",
+  footerStatusOperational: "ระบบทำงานปกติ 99.9% Uptime",
+  footerVatBadge: "รองรับคำนวณ VAT 7%",
+  footerOfflineBadge: "บันทึกข้อมูลปลอดภัย (Local Storage)",
+  footerDeviceSupport: "รองรับ PC, Tablet & Mobile",
+  footerBackToTop: "กลับสู่ด้านบน",
+  footerBuiltWith: "พัฒนาด้วย React & TypeScript",
+  footerQuickCheckout: "คิดเงินรวดเร็ว 0.4 วินาที",
+  footerRoleControl: "สิทธิ์พนักงาน 6 ระดับ",
+  footerAnalytics: "วิเคราะห์ยอดขายเรียลไทม์",
+  footerDualLang: "รองรับ 2 ภาษา (ไทย / English)",
 };
 
 export const landingEn = {
@@ -132,6 +146,21 @@ export const landingEn = {
   readySubtitle:
     "Access Yummy POS directly through your modern web browser. No complex installation required, runs on any device.",
   getStartedBtn: "Sign In to POS Now",
-  footerDesc: "Next-Generation Point of Sale & Business Management Platform.",
+  footerDesc:
+    "Intelligent Point of Sale platform for restaurants, cafes, and modern retail. Fast checkout, precise stock sync, and real-time profit analytics.",
   allRightsReserved: "All rights reserved.",
+  footerNavTitle: "Navigation",
+  footerModulesTitle: "System Modules",
+  footerSecurityTitle: "Security & Standards",
+  footerSupportTitle: "Devices & Support",
+  footerStatusOperational: "All Systems Operational • 99.9% Uptime",
+  footerVatBadge: "VAT 7% & Tax Calculation",
+  footerOfflineBadge: "Secure Local Storage & Cache",
+  footerDeviceSupport: "Supports PC, Tablet & Mobile",
+  footerBackToTop: "Back to Top",
+  footerBuiltWith: "Built with React & TypeScript",
+  footerQuickCheckout: "0.4s Fast Checkout",
+  footerRoleControl: "6-Level Granular Roles",
+  footerAnalytics: "Real-time Sales Analytics",
+  footerDualLang: "Bilingual (Thai / English)",
 };

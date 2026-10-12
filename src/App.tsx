@@ -20,7 +20,12 @@ import Divider from "@mui/material/Divider";
 import { createAppTheme } from "./theme/theme";
 import { PosProvider, usePos, hasMenuPermission } from "./context/PosContext";
 import { LogOut, Settings, Sun, Moon, Languages, Sparkles, Menu as MenuIcon, X } from "lucide-react";
-import { LandingPage, LoginScreen } from "./components/screens";
+const LandingPage = React.lazy(() =>
+  import("./components/screens/LandingPage").then((m) => ({ default: m.LandingPage }))
+);
+const LoginScreen = React.lazy(() =>
+  import("./components/screens/LoginScreen").then((m) => ({ default: m.LoginScreen }))
+);
 import { Sidebar } from "./components/layout";
 import {
   FEATURE_REGISTRY,
@@ -497,33 +502,41 @@ const AppContent: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Routes>
-        {/* 1. Landing / Introduction Page (Default start page on entry) */}
-        <Route path="/" element={<LandingPage />} />
+      <React.Suspense
+        fallback={
+          <div className="min-h-screen w-full flex items-center justify-center bg-transparent">
+            <div className="w-8 h-8 border-3 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+          </div>
+        }
+      >
+        <Routes>
+          {/* 1. Landing / Introduction Page (Default start page on entry) */}
+          <Route path="/" element={<LandingPage />} />
 
-        {/* 2. Authentication Login Screen */}
-        <Route path="/login" element={<LoginScreen />} />
+          {/* 2. Authentication Login Screen */}
+          <Route path="/login" element={<LoginScreen />} />
 
-        {/* 3. Protected POS Application Screens (Dynamically generated from Central Feature Registry) */}
-        <Route element={<ProtectedLayout />}>
-          {FEATURE_REGISTRY.map((feat) => (
-            <Route
-              key={feat.id}
-              path={`/${feat.path}`}
-              element={
-                feat.scrollableContainer ? (
-                  <div className="flex-1 overflow-y-auto">{feat.component}</div>
-                ) : (
-                  feat.component
-                )
-              }
-            />
-          ))}
-        </Route>
+          {/* 3. Protected POS Application Screens (Dynamically generated from Central Feature Registry) */}
+          <Route element={<ProtectedLayout />}>
+            {FEATURE_REGISTRY.map((feat) => (
+              <Route
+                key={feat.id}
+                path={`/${feat.path}`}
+                element={
+                  feat.scrollableContainer ? (
+                    <div className="flex-1 overflow-y-auto">{feat.component}</div>
+                  ) : (
+                    feat.component
+                  )
+                }
+              />
+            ))}
+          </Route>
 
-        {/* 4. Fallback: redirect any unknown URL to landing page */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          {/* 4. Fallback: redirect any unknown URL to landing page */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </React.Suspense>
     </ThemeProvider>
   );
 };

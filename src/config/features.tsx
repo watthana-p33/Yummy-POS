@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy } from 'react';
 import type { TranslationSchema } from '../i18n/translations';
 import {
   ShoppingCart,
@@ -8,14 +8,34 @@ import {
   BarChart3,
   ScrollText,
 } from 'lucide-react';
-import {
-  PosScreen,
-  ProductManagementScreen,
-  ShiftScreen,
-  StaffManagementScreen,
-  SalesHistoryScreen,
-  ReportsScreen,
-} from '../components/screens';
+
+// Code-split / lazy-load screens on-demand to reduce initial bundle and accelerate page entry
+const PosScreen = lazy(() =>
+  import('../components/screens/PosScreen').then((m) => ({ default: m.PosScreen }))
+);
+const ProductManagementScreen = lazy(() =>
+  import('../components/screens/ProductManagementScreen').then((m) => ({
+    default: m.ProductManagementScreen,
+  }))
+);
+const ShiftScreen = lazy(() =>
+  import('../components/screens/ShiftScreen').then((m) => ({ default: m.ShiftScreen }))
+);
+const StaffManagementScreen = lazy(() =>
+  import('../components/screens/StaffManagementScreen').then((m) => ({
+    default: m.StaffManagementScreen,
+  }))
+);
+const SalesHistoryScreen = lazy(() =>
+  import('../components/screens/SalesHistoryScreen').then((m) => ({
+    default: m.SalesHistoryScreen,
+  }))
+);
+const ReportsScreen = lazy(() =>
+  import('../components/screens/ReportsScreen').then((m) => ({
+    default: m.ReportsScreen,
+  }))
+);
 
 export type FeatureId =
   | 'pos'

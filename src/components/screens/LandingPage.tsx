@@ -20,6 +20,11 @@ import {
   CreditCard,
   QrCode,
   Banknote,
+  ArrowUp,
+  ShieldCheck,
+  CheckCircle2,
+  Monitor,
+  Zap,
 } from 'lucide-react';
 import { Tooltip } from '@mui/material';
 import { LiquidBackground } from '../common';
@@ -143,19 +148,19 @@ export const LandingPage: React.FC = () => {
       {/* Luminous Organic Liquid Ambient Layer */}
       <LiquidBackground />
 
-      {/* STICKY TOP NAVBAR */}
+      {/* FIXED TOP NAVBAR */}
       <header
-        className={`sticky top-0 z-50 backdrop-blur-xl border-b transition-colors duration-200 ${
+        className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-xl border-b transition-colors duration-200 ${
           isDark
-            ? 'bg-[#0c0e17]/80 border-white/[0.08] shadow-[0_4px_20px_rgba(0,0,0,0.5)]'
-            : 'bg-white/80 border-[#ebe7df] shadow-[0_4px_20px_rgba(0,0,0,0.04)]'
+            ? 'bg-[#0c0e17]/85 border-white/[0.08] shadow-[0_4px_20px_rgba(0,0,0,0.5)]'
+            : 'bg-white/85 border-[#ebe7df] shadow-[0_4px_20px_rgba(0,0,0,0.04)]'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between gap-2 sm:gap-4">
           {/* Brand Logo & Title */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink-0">
             <div
-              className="w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-md flex-shrink-0 transition-transform duration-300 hover:scale-105"
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl flex items-center justify-center text-white shadow-md flex-shrink-0 transition-transform duration-300 hover:scale-105"
               style={{
                 backgroundColor: 'var(--theme-primary)',
                 boxShadow: '0 4px 14px var(--theme-primary-border)',
@@ -164,16 +169,16 @@ export const LandingPage: React.FC = () => {
               <img
                 src={inkbrushLogo}
                 alt="Yummy POS Logo"
-                className="w-7 h-7 object-contain brightness-0 invert"
+                className="w-5 h-5 sm:w-7 sm:h-7 object-contain brightness-0 invert"
               />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-lg sm:text-xl tracking-tight text-slate-900 dark:text-white">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="font-bold text-base sm:text-xl tracking-tight text-slate-900 dark:text-white whitespace-nowrap">
                   {t.common.appName}
                 </span>
                 <span
-                  className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full tracking-wider"
+                  className="hidden sm:inline-flex text-[10px] uppercase font-bold px-2 py-0.5 rounded-full tracking-wider whitespace-nowrap"
                   style={{
                     backgroundColor: 'var(--theme-primary-light)',
                     color: 'var(--theme-primary-text)',
@@ -182,7 +187,7 @@ export const LandingPage: React.FC = () => {
                   {t.common.version}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium hidden sm:block">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium hidden sm:block whitespace-nowrap">
                 {t.common.appSubtitle}
               </p>
             </div>
@@ -217,23 +222,26 @@ export const LandingPage: React.FC = () => {
           </nav>
 
           {/* Right Action Tools: Language, Theme & Sign In Button */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
             {/* Language Switcher */}
             <Tooltip title={language === 'th' ? 'Switch to English' : 'เปลี่ยนเป็นภาษาไทย'}>
               <button
                 type="button"
                 onClick={toggleLanguage}
-                className={`h-9 px-2.5 rounded-2xl border flex items-center gap-1.5 transition-all duration-200 cursor-pointer active:scale-95 shadow-xs text-xs font-semibold select-none ${
+                className={`h-9 px-2 sm:px-2.5 rounded-xl sm:rounded-2xl border flex items-center gap-1 sm:gap-1.5 transition-all duration-200 cursor-pointer active:scale-95 shadow-xs text-xs font-semibold select-none flex-shrink-0 ${
                   isDark
                     ? 'bg-white/10 hover:bg-white/18 border-white/15 text-slate-200'
                     : 'bg-white/80 hover:bg-white border-black/5 text-slate-700 hover:text-slate-900'
                 }`}
                 aria-label="Toggle language"
               >
-                <Languages className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--theme-primary)' }} />
-                <span className={language === 'th' ? 'font-bold underline' : 'opacity-60'}>TH</span>
-                <span className="text-slate-300 dark:text-slate-600 font-light">|</span>
-                <span className={language === 'en' ? 'font-bold underline' : 'opacity-60'}>EN</span>
+                <Languages className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" style={{ color: 'var(--theme-primary)' }} />
+                <span className="sm:hidden text-[11px] font-bold uppercase tracking-wide">{language}</span>
+                <span className="hidden sm:inline-flex items-center gap-1">
+                  <span className={language === 'th' ? 'font-bold underline' : 'opacity-60'}>TH</span>
+                  <span className="text-slate-300 dark:text-slate-600 font-light">|</span>
+                  <span className={language === 'en' ? 'font-bold underline' : 'opacity-60'}>EN</span>
+                </span>
               </button>
             </Tooltip>
 
@@ -242,7 +250,7 @@ export const LandingPage: React.FC = () => {
               <button
                 type="button"
                 onClick={toggleTheme}
-                className={`w-9 h-9 rounded-2xl border flex items-center justify-center transition-all duration-200 cursor-pointer active:scale-95 shadow-xs ${
+                className={`w-9 h-9 rounded-xl sm:rounded-2xl border flex items-center justify-center transition-all duration-200 cursor-pointer active:scale-95 shadow-xs flex-shrink-0 ${
                   isDark
                     ? 'bg-white/10 hover:bg-white/18 border-white/15 text-amber-300'
                     : 'bg-white/80 hover:bg-white border-black/5 text-slate-700 hover:text-slate-900'
@@ -258,40 +266,48 @@ export const LandingPage: React.FC = () => {
             </Tooltip>
 
             {/* Sign In / Launch POS Button */}
-            <button
-              type="button"
-              data-testid="landing-signin-btn"
-              onClick={handleSignInClick}
-              className="h-10 px-4 rounded-2xl text-white font-semibold text-xs sm:text-sm flex items-center gap-2 cursor-pointer shadow-md transition-all duration-200 hover:scale-[1.03] active:scale-95"
-              style={{
-                backgroundColor: 'var(--theme-primary)',
-                boxShadow: '0 4px 14px var(--theme-primary-border)',
-              }}
-            >
-              {currentUser ? (
-                <>
-                  <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 border border-white/60 bg-white/40">
-                    <img
-                      src={getUserAvatarSrc(currentUser)}
-                      alt={currentUser.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <span className="truncate max-w-[120px] sm:max-w-[160px]">
-                    {lt.launchPosBtn}
-                  </span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              ) : (
-                <>
-                  <LogIn className="w-4 h-4" />
-                  <span>{lt.signInBtn}</span>
-                </>
-              )}
-            </button>
+            <Tooltip title={currentUser ? lt.launchPosBtn : lt.signInBtn}>
+              <button
+                type="button"
+                data-testid="landing-signin-btn"
+                onClick={handleSignInClick}
+                className="w-9 h-9 sm:w-auto sm:h-10 px-0 sm:px-4 rounded-xl sm:rounded-2xl text-white font-semibold text-xs sm:text-sm flex items-center justify-center sm:gap-2 cursor-pointer shadow-md transition-all duration-200 hover:scale-[1.03] active:scale-95 flex-shrink-0 whitespace-nowrap"
+                style={{
+                  backgroundColor: 'var(--theme-primary)',
+                  boxShadow: '0 4px 14px var(--theme-primary-border)',
+                }}
+                aria-label={currentUser ? lt.launchPosBtn : lt.signInBtn}
+              >
+                {currentUser ? (
+                  <>
+                    <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 border border-white/60 bg-white/40">
+                      <img
+                        src={getUserAvatarSrc(currentUser)}
+                        alt={currentUser.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <span className="hidden sm:inline whitespace-nowrap">
+                      {lt.launchPosBtn}
+                    </span>
+                    <ArrowRight className="w-4 h-4 hidden sm:block flex-shrink-0" />
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="w-4 h-4 flex-shrink-0" />
+                    <span className="hidden sm:inline whitespace-nowrap">
+                      {lt.signInBtn}
+                    </span>
+                  </>
+                )}
+              </button>
+            </Tooltip>
           </div>
         </div>
       </header>
+
+      {/* Fixed Navbar Spacer */}
+      <div className="h-16 sm:h-18" aria-hidden="true" />
 
       {/* HERO SECTION */}
       <section className="relative pt-12 pb-20 sm:pt-20 sm:pb-28 overflow-hidden">
@@ -866,28 +882,223 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* FOOTER */}
-      <footer className="py-10 border-t border-black/5 dark:border-white/10 text-xs text-slate-500 dark:text-slate-400">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5">
-            <div
-              className="w-7 h-7 rounded-xl flex items-center justify-center text-white"
-              style={{ backgroundColor: 'var(--theme-primary)' }}
-            >
-              <img
-                src={inkbrushLogo}
-                alt="Logo"
-                className="w-4 h-4 object-contain brightness-0 invert"
-              />
+      <footer className="relative z-10 border-t border-black/10 dark:border-white/10 bg-white/80 dark:bg-[#0c0e17]/90 backdrop-blur-xl transition-colors duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-10">
+          {/* Main Footer Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-8 sm:gap-10">
+            {/* Col 1-2: Brand & Identity */}
+            <div className="sm:col-span-2 lg:col-span-2 space-y-4">
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-md flex-shrink-0 transition-transform duration-300 hover:scale-105"
+                  style={{
+                    backgroundColor: 'var(--theme-primary)',
+                    boxShadow: '0 4px 14px var(--theme-primary-border)',
+                  }}
+                >
+                  <img
+                    src={inkbrushLogo}
+                    alt="Yummy POS Logo"
+                    className="w-6 h-6 object-contain brightness-0 invert"
+                  />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-extrabold text-xl tracking-tight text-slate-900 dark:text-white">
+                      {t.common.appName}
+                    </span>
+                    <span
+                      className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full tracking-wider"
+                      style={{
+                        backgroundColor: 'var(--theme-primary-light)',
+                        color: 'var(--theme-primary-text)',
+                      }}
+                    >
+                      {t.common.version}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    {t.common.appSubtitle}
+                  </p>
+                </div>
+              </div>
+
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-sm">
+                {lt.footerDesc}
+              </p>
+
+              {/* Status & Highlights */}
+              <div className="pt-1 space-y-2.5">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-xs font-semibold">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  <span>{lt.footerStatusOperational}</span>
+                </div>
+
+                <div className="flex flex-wrap gap-2 text-[11px] text-slate-600 dark:text-slate-400 font-medium">
+                  <span className="px-2.5 py-1 rounded-lg bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5">
+                    ⚡ {lt.footerQuickCheckout}
+                  </span>
+                  <span className="px-2.5 py-1 rounded-lg bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5">
+                    🛡️ {lt.footerRoleControl}
+                  </span>
+                </div>
+              </div>
             </div>
-            <span className="font-bold text-sm text-slate-800 dark:text-white">
-              {t.common.appName}
-            </span>
-            <span className="text-slate-400 dark:text-slate-600">|</span>
-            <span>{lt.footerDesc}</span>
+
+            {/* Col 3: Navigation Links */}
+            <div className="space-y-3.5">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
+                {lt.footerNavTitle}
+              </h4>
+              <ul className="space-y-2.5 text-xs text-slate-600 dark:text-slate-300">
+                <li>
+                  <a
+                    href="#features"
+                    className="hover:text-primary transition-colors duration-150 inline-flex items-center gap-1.5"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-500" />
+                    <span>{lt.navFeatures}</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#workflow"
+                    className="hover:text-primary transition-colors duration-150 inline-flex items-center gap-1.5"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-500" />
+                    <span>{lt.navWorkflow}</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#roles"
+                    className="hover:text-primary transition-colors duration-150 inline-flex items-center gap-1.5"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-500" />
+                    <span>{lt.navRoles}</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#preview"
+                    className="hover:text-primary transition-colors duration-150 inline-flex items-center gap-1.5"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-500" />
+                    <span>{lt.liveDemoTitle}</span>
+                  </a>
+                </li>
+                <li className="pt-1">
+                  <button
+                    type="button"
+                    onClick={handleSignInClick}
+                    className="hover:underline transition-all duration-150 inline-flex items-center gap-1.5 font-bold cursor-pointer text-left"
+                    style={{ color: 'var(--theme-primary)' }}
+                  >
+                    <ArrowRight className="w-3.5 h-3.5" />
+                    <span>{currentUser ? lt.launchPosBtn : lt.signInBtn}</span>
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            {/* Col 4: System Modules */}
+            <div className="space-y-3.5">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
+                {lt.footerModulesTitle}
+              </h4>
+              <ul className="space-y-2.5 text-xs text-slate-600 dark:text-slate-300">
+                <li className="flex items-center gap-2">
+                  <ShoppingCart className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
+                  <span>{lt.feat1Title}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Package className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+                  <span>{lt.feat2Title}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Clock className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+                  <span>{lt.feat3Title}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Users className="w-3.5 h-3.5 text-purple-500 flex-shrink-0" />
+                  <span>{lt.feat4Title}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <BarChart3 className="w-3.5 h-3.5 text-sky-500 flex-shrink-0" />
+                  <span>{lt.feat5Title}</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Col 5: Security & Compliance */}
+            <div className="space-y-3.5">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
+                {lt.footerSecurityTitle}
+              </h4>
+              <ul className="space-y-2.5 text-xs text-slate-600 dark:text-slate-300">
+                <li className="flex items-center gap-2">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
+                  <span>PromptPay QR (EMVCo)</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
+                  <span>{lt.footerVatBadge}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
+                  <span>{lt.footerOfflineBadge}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
+                  <span>{lt.footerAnalytics}</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Col 6: Support & Devices */}
+            <div className="space-y-3.5">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
+                {lt.footerSupportTitle}
+              </h4>
+              <ul className="space-y-2.5 text-xs text-slate-600 dark:text-slate-300">
+                <li className="flex items-center gap-2">
+                  <Monitor className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 flex-shrink-0" />
+                  <span>{lt.footerDeviceSupport}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Languages className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 flex-shrink-0" />
+                  <span>{lt.footerDualLang}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Zap className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+                  <span>Barcode & Cash Drawer</span>
+                </li>
+              </ul>
+            </div>
           </div>
 
-          <div>
-            © 2026 {t.common.appName}. {lt.allRightsReserved}
+          {/* Bottom Bar: Copyright, Tech Tag, and Back-to-Top */}
+          <div className="mt-12 pt-6 border-t border-black/10 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
+            <div className="text-center sm:text-left">
+              © 2026 <span className="font-bold text-slate-700 dark:text-slate-200">{t.common.appName}</span>. {lt.allRightsReserved}
+            </div>
+
+            <div className="flex items-center gap-4">
+              <span className="hidden md:inline-block text-[11px] text-slate-400 dark:text-slate-500">
+                {lt.footerBuiltWith}
+              </span>
+              <button
+                type="button"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 transition font-medium cursor-pointer"
+              >
+                <span>{lt.footerBackToTop}</span>
+                <ArrowUp className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         </div>
       </footer>
