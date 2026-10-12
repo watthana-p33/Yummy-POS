@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { usePos } from '../context/PosContext';
+import { usePos } from '../../context/PosContext';
 import {
   Store,
   ShieldCheck,
@@ -24,9 +24,9 @@ import {
   Copy,
 } from 'lucide-react';
 import { Tooltip, MenuItem } from '@mui/material';
-import { PosInput, PosSelect, PosButton, LiquidBackground } from './common';
-import manAvatar from '../assets/man.png';
-import womanAvatar from '../assets/woman.jpg';
+import { PosInput, PosSelect, PosButton, LiquidBackground } from '../common';
+import manAvatar from '../../assets/man.png';
+import womanAvatar from '../../assets/woman.jpg';
 
 interface RegisterScreenProps {
   onBackToLogin: (prefilledUsername?: string) => void;

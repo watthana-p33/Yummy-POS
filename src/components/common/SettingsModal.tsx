@@ -52,7 +52,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
   const handleResetDefaults = () => {
     setAccentColor('sage');
-    setFontFamily('Prompt');
+    setFontFamily('Comic Relief');
     setLanguage('th');
   };
 

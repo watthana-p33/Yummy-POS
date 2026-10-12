@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { usePos } from '../context/PosContext';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { usePos } from '../../context/PosContext';
 import {
   ShieldCheck,
   UserCheck,
@@ -7,22 +8,30 @@ import {
   Moon,
   Sparkles,
   ArrowRight,
+  ArrowLeft,
   Coffee,
   Languages,
 } from 'lucide-react';
 import { Alert, Tooltip, Box } from '@mui/material';
-import { PosButton, PosInput, LiquidBackground } from './common';
+import { PosButton, PosInput, LiquidBackground } from '../common';
 import { RegisterScreen } from './RegisterScreen';
-import inkbrushLogo from '../assets/inkbrush-person-sending-money.svg';
-import manAvatar from '../assets/man.png';
-import womanAvatar from '../assets/woman.jpg';
+import inkbrushLogo from '../../assets/inkbrush-person-sending-money.svg';
+import manAvatar from '../../assets/man.png';
+import womanAvatar from '../../assets/woman.jpg';
 
 export const LoginScreen: React.FC = () => {
-  const { login, users, themeMode, toggleTheme, language, toggleLanguage, t } = usePos();
+  const { currentUser, login, users, themeMode, toggleTheme, language, toggleLanguage, t } = usePos();
+  const navigate = useNavigate();
   const [username, setUsername] = useState('somchai');
   const [password, setPassword] = useState('123456');
   const [error, setError] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
+
+  useEffect(() => {
+    if (currentUser) {
+      navigate('/pos', { replace: true });
+    }
+  }, [currentUser, navigate]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,7 +40,9 @@ export const LoginScreen: React.FC = () => {
       return;
     }
     const success = login(username);
-    if (!success) {
+    if (success) {
+      navigate('/pos');
+    } else {
       setError(t.login.errorNotFound);
     }
   };
@@ -58,60 +69,109 @@ export const LoginScreen: React.FC = () => {
   }
 
   return (
-    <div
-      className={`min-h-screen w-full flex items-center justify-center p-4 sm:p-6 transition-colors duration-300 relative overflow-hidden ${
-        isDark
-          ? 'bg-[#080911] text-slate-100'
-          : 'bg-[#e6e3da] text-slate-800'
-      }`}
+    <Box
+      sx={{
+        minHeight: '100vh',
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: { xs: 'flex-start', md: 'center' },
+        p: { xs: 2, sm: 3, md: 4 },
+        py: { xs: 2.5, sm: 4 },
+        position: 'relative',
+        overflowX: 'hidden',
+        overflowY: 'auto',
+        color: isDark ? '#f1f5f9' : '#1e293b',
+        bgcolor: isDark ? '#080911' : '#e6e3da',
+        transition: 'background-color 0.3s ease, color 0.3s ease',
+      }}
     >
       {/* Luminous Organic Liquid Blob Ambient Layer */}
       <LiquidBackground />
 
-      {/* Floating Utility Controls (Language & Theme Switcher) at Top Right */}
-      <div className="absolute top-5 right-5 sm:top-8 sm:right-8 z-20 flex items-center gap-2.5">
-        {/* Language Switcher */}
-        <Tooltip title={t.sidebar.switchLang}>
+      {/* Top Navigation & Controls Toolbar: static above card on mobile, fixed at screen corners on md+ */}
+      <Box
+        sx={{
+          position: { xs: 'static', md: 'fixed' },
+          top: { md: 24, lg: 32 },
+          left: { md: 24, lg: 32 },
+          right: { md: 24, lg: 32 },
+          width: { xs: '100%', md: 'auto' },
+          maxWidth: { xs: '56rem', md: 'none' },
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          zIndex: 20,
+          mb: { xs: 2, md: 0 },
+          px: { xs: 0.5, md: 0 },
+          pointerEvents: { xs: 'auto', md: 'none' },
+          '& > *': {
+            pointerEvents: 'auto',
+          },
+        }}
+      >
+        {/* Back to System Overview (Landing Page) */}
+        <Tooltip title={language === 'th' ? 'กลับหน้าแนะนำระบบ' : 'Back to System Overview'}>
           <button
-            data-testid="toggle-lang-btn"
-            onClick={toggleLanguage}
-            className={`min-h-[44px] min-w-[70px] flex items-center gap-2 px-3.5 py-2.5 rounded-2xl border text-xs font-semibold transition-all duration-200 cursor-pointer backdrop-blur-xl active:scale-95 ${
+            type="button"
+            onClick={() => navigate('/')}
+            className={`min-h-[40px] sm:min-h-[44px] flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl border text-xs font-semibold transition-all duration-200 cursor-pointer backdrop-blur-xl active:scale-95 ${
               isDark
-                ? 'bg-[#1a202c]/80 border-white/[0.1] text-primary hover:bg-[#232936] shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.1)]'
-                : 'bg-white/85 border-[#ebe7df]/90 text-primary hover:bg-[#f5f4ef] shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.95)]'
+                ? 'bg-[#1a202c]/80 border-white/[0.1] text-slate-200 hover:bg-[#232936] hover:text-white shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.1)]'
+                : 'bg-white/85 border-[#ebe7df]/90 text-slate-700 hover:bg-[#f5f4ef] hover:text-slate-900 shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.95)]'
             }`}
           >
-            <Languages className="w-4 h-4 text-primary" />
-            <span className={language === 'th' ? 'font-bold underline' : 'opacity-60'}>TH</span>
-            <span className="text-slate-300 dark:text-slate-600 font-light">|</span>
-            <span className={language === 'en' ? 'font-bold underline' : 'opacity-60'}>EN</span>
+            <ArrowLeft className="w-4 h-4 text-primary flex-shrink-0" />
+            <Box component="span">{language === 'th' ? 'แนะนำระบบ' : 'Overview'}</Box>
           </button>
         </Tooltip>
 
-        {/* Theme Switcher */}
-        <Tooltip title={isDark ? t.sidebar.switchToLight : t.sidebar.switchToDark}>
-          <button
-            onClick={toggleTheme}
-            className={`min-h-[44px] min-w-[44px] flex items-center gap-2 px-4 py-2.5 rounded-2xl border text-xs font-semibold transition-all duration-200 cursor-pointer backdrop-blur-xl active:scale-95 ${
-              isDark
-                ? 'bg-[#1a202c]/80 border-white/[0.1] text-[#f4a28c] hover:bg-[#232936] shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.1)]'
-                : 'bg-white/85 border-[#ebe7df]/90 text-slate-700 hover:bg-[#f5f4ef] shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.95)]'
-            }`}
-          >
-            {isDark ? (
-              <>
-                <Sun className="w-4 h-4 text-[#f4a28c]" />
-                <span>{t.sidebar.themeLight}</span>
-              </>
-            ) : (
-              <>
-                <Moon className="w-4 h-4 text-slate-600" />
-                <span>{t.sidebar.themeDark}</span>
-              </>
-            )}
-          </button>
-        </Tooltip>
-      </div>
+        {/* Floating Utility Controls (Language & Theme Switcher) */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 } }}>
+          {/* Language Switcher */}
+          <Tooltip title={t.sidebar.switchLang}>
+            <button
+              data-testid="toggle-lang-btn"
+              onClick={toggleLanguage}
+              className={`min-h-[40px] sm:min-h-[44px] flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-2 sm:py-2.5 rounded-2xl border text-xs font-semibold transition-all duration-200 cursor-pointer backdrop-blur-xl active:scale-95 ${
+                isDark
+                  ? 'bg-[#1a202c]/80 border-white/[0.1] text-primary hover:bg-[#232936] shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.1)]'
+                  : 'bg-white/85 border-[#ebe7df]/90 text-primary hover:bg-[#f5f4ef] shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.95)]'
+              }`}
+            >
+              <Languages className="w-4 h-4 text-primary flex-shrink-0" />
+              <span className={language === 'th' ? 'font-bold underline' : 'opacity-60'}>TH</span>
+              <span className="text-slate-300 dark:text-slate-600 font-light">|</span>
+              <span className={language === 'en' ? 'font-bold underline' : 'opacity-60'}>EN</span>
+            </button>
+          </Tooltip>
+
+          {/* Theme Switcher */}
+          <Tooltip title={isDark ? t.sidebar.switchToLight : t.sidebar.switchToDark}>
+            <button
+              onClick={toggleTheme}
+              className={`min-h-[40px] sm:min-h-[44px] flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl border text-xs font-semibold transition-all duration-200 cursor-pointer backdrop-blur-xl active:scale-95 ${
+                isDark
+                  ? 'bg-[#1a202c]/80 border-white/[0.1] text-[#f4a28c] hover:bg-[#232936] shadow-[0_4px_16px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.1)]'
+                  : 'bg-white/85 border-[#ebe7df]/90 text-slate-700 hover:bg-[#f5f4ef] shadow-[0_4px_16px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.95)]'
+              }`}
+            >
+              {isDark ? (
+                <>
+                  <Sun className="w-4 h-4 text-[#f4a28c] flex-shrink-0" />
+                  <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>{t.sidebar.themeLight}</Box>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-4 h-4 text-slate-600 flex-shrink-0" />
+                  <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>{t.sidebar.themeDark}</Box>
+                </>
+              )}
+            </button>
+          </Tooltip>
+        </Box>
+      </Box>
 
       {/* Main Login Card - Liquid Luxury Minimal Layout */}
       <div
@@ -123,7 +183,7 @@ export const LoginScreen: React.FC = () => {
       >
         {/* Left Brand Panel (40% on Desktop) */}
         <div
-          className="md:col-span-5 p-8 sm:p-10 flex flex-col justify-between text-white relative overflow-hidden bg-gradient-to-br from-primary to-[var(--theme-primary-hover)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.35)]"
+          className="md:col-span-5 p-5 sm:p-8 md:p-10 flex flex-col justify-between text-white relative overflow-hidden bg-gradient-to-br from-primary to-[var(--theme-primary-hover)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.35)]"
         >
           {/* Subtle Graphic Texture */}
           <div className="absolute inset-0 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px] opacity-10 pointer-events-none" />
@@ -135,28 +195,28 @@ export const LoginScreen: React.FC = () => {
               <span>{t.login.badge}</span>
             </div>
 
-            <div className="mt-8">
-              <div className="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center text-white shadow-inner mb-4">
+            <div className="mt-4 sm:mt-6 md:mt-8">
+              <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center text-white shadow-inner mb-3 sm:mb-4">
                 <img
                   src={inkbrushLogo}
                   alt="Logo"
-                  className="w-10 h-10 object-contain brightness-0 invert"
+                  className="w-8 h-8 sm:w-10 sm:h-10 object-contain brightness-0 invert"
                 />
               </div>
-              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
                 {t.login.welcomeHeader}
               </h1>
-              <p className="text-white/80 text-sm mt-2 leading-relaxed">
+              <p className="text-white/80 text-xs sm:text-sm mt-1.5 sm:mt-2 leading-relaxed">
                 {t.login.welcomeDesc}
               </p>
             </div>
           </div>
 
           {/* Bottom Shift Helper Banner */}
-          <div className="relative z-10 mt-10 pt-6 border-t border-white/15">
+          <div className="relative z-10 mt-4 sm:mt-8 md:mt-10 pt-4 sm:pt-6 border-t border-white/15">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center flex-shrink-0">
-                <Coffee className="w-5 h-5 text-amber-100" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/15 flex items-center justify-center flex-shrink-0">
+                <Coffee className="w-4 h-4 sm:w-5 sm:h-5 text-amber-100" />
               </div>
               <div>
                 <div className="text-xs font-semibold text-white">{t.login.shiftStatus}</div>
@@ -166,7 +226,7 @@ export const LoginScreen: React.FC = () => {
         </div>
 
         {/* Right Form & Quick Cashier Panel (60% on Desktop) */}
-        <div className="md:col-span-7 p-6 sm:p-10 flex flex-col justify-between">
+        <div className="md:col-span-7 p-5 sm:p-8 md:p-10 flex flex-col justify-between">
           <div className="bg-transparent">
             <div className="flex items-center justify-between mb-6">
               <div>
@@ -301,6 +361,6 @@ export const LoginScreen: React.FC = () => {
         </div>
       </div>
 
-    </div>
+    </Box>
   );
 };

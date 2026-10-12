@@ -1,9 +1,19 @@
 import React, { useState, useMemo } from 'react';
-import { usePos } from '../context/PosContext';
-import type { Order } from '../types/pos';
-import { PosCard, PosButton, PosInput, PosSelect, PosTable, type PosTableColumn } from './common';
-import { MenuItem, Dialog } from '@mui/material';
+import { usePos } from '../../context/PosContext';
+import type { Order } from '../../types/pos';
+import {
+  PosCard,
+  PosButton,
+  PosInput,
+  PosSelect,
+  PosTable,
+  type PosTableColumn,
+  PageHeader,
+  PageContainer,
+} from '../common';
+import { MenuItem, Dialog, Box, useTheme, useMediaQuery } from '@mui/material';
 import { SalesChartsSection } from './SalesChartsSection';
+import { exportStyledExcel, type ExcelColumn } from '../../utils/excelExport';
 import {
   TrendingUp,
   FileText,
@@ -18,10 +28,14 @@ import {
   Printer,
   X,
   RotateCcw,
+  Download,
+  Receipt,
 } from 'lucide-react';
 
 export const SalesHistoryScreen: React.FC = () => {
   const { orders, t } = usePos();
+  const theme = useTheme();
+  const isMobileScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   // Advanced Filters State
   const [searchReceipt, setSearchReceipt] = useState('');
@@ -216,19 +230,139 @@ export const SalesHistoryScreen: React.FC = () => {
     },
   ];
 
+  const handleExportExcel = () => {
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
+    const totalUnitsSold = filteredOrders.reduce(
+      (sum, o) => sum + o.items.reduce((s, i) => s + i.quantity, 0),
+      0
+    );
+
+    const getPaymentLabel = (method: string) => {
+      switch (method) {
+        case 'promptpay':
+          return t.sales.filterPromptPay || 'พร้อมเพย์ (PromptPay)';
+        case 'cash':
+          return t.sales.filterCash || 'เงินสด (Cash)';
+        case 'credit_card':
+          return t.sales.filterCard || 'บัตรเครดิต (Card)';
+        default:
+          return method;
+      }
+    };
+
+    const filterInfoParts: string[] = [];
+    if (selectedCashier !== 'all') filterInfoParts.push(`แคชเชียร์: ${selectedCashier}`);
+    if (selectedPayment !== 'all') filterInfoParts.push(`การชำระ: ${getPaymentLabel(selectedPayment)}`);
+    if (startDate) filterInfoParts.push(`จาก: ${startDate}`);
+    if (endDate) filterInfoParts.push(`ถึง: ${endDate}`);
+    const filterInfo = filterInfoParts.length > 0 ? `   |   ตัวกรอง: ${filterInfoParts.join(', ')}` : '';
+
+    const columns: ExcelColumn<Order>[] = [
+      {
+        key: 'receiptNumber',
+        header: 'เลขที่ใบเสร็จ (Receipt No.)',
+        width: 22,
+        align: 'center',
+      },
+      {
+        key: 'date',
+        header: 'วันที่ (Date)',
+        width: 16,
+        align: 'center',
+        formatter: (_v, o) => new Date(o.timestamp).toLocaleDateString('th-TH'),
+      },
+      {
+        key: 'time',
+        header: 'เวลา (Time)',
+        width: 14,
+        align: 'center',
+        formatter: (_v, o) => new Date(o.timestamp).toLocaleTimeString('th-TH'),
+      },
+      {
+        key: 'cashierName',
+        header: 'พนักงานขาย (Cashier)',
+        width: 20,
+        align: 'left',
+      },
+      {
+        key: 'customerName',
+        header: 'ลูกค้า (Customer)',
+        width: 20,
+        align: 'left',
+        formatter: (v) => v || '-',
+      },
+      {
+        key: 'paymentMethod',
+        header: 'ช่องทางชำระ (Payment)',
+        width: 20,
+        align: 'center',
+        formatter: (v) => getPaymentLabel(v),
+      },
+      {
+        key: 'itemsCount',
+        header: 'จำนวนชิ้น (Items)',
+        width: 16,
+        align: 'center',
+        formatter: (_v, o) => `${o.items.reduce((s, i) => s + i.quantity, 0)} ชิ้น`,
+      },
+      {
+        key: 'total',
+        header: 'ยอดสุทธิ (Net Total THB)',
+        width: 22,
+        align: 'right',
+        formatter: (v) => `฿${Number(v).toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+      },
+    ];
+
+    exportStyledExcel({
+      fileName: `YummyPOS_SalesHistory_${dateStr}.xlsx`,
+      sheetName: 'SalesHistory',
+      title: `📜 ${t.common.appName || 'YUMMY POS'} — รายงานประวัติการขาย (SALES HISTORY)`,
+      subtitle: `สาขา: ${t.pos?.storeBranch || 'สาขาหลัก Central Food Court'}   |   วันที่ออกรายงาน: ${now.toLocaleDateString('th-TH')} ${now.toLocaleTimeString('th-TH')}${filterInfo}`,
+      kpiCards: [
+        {
+          title: '💰 ยอดขายสุทธิรวม (TOTAL REVENUE)',
+          value: `฿${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+        },
+        {
+          title: '🧾 จำนวนบิลทั้งหมด (TOTAL ORDERS)',
+          value: `${totalBills} บิล`,
+        },
+        {
+          title: '📈 ยอดเฉลี่ยต่อบิล (AVG TICKET)',
+          value: `฿${avgTicket.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+        },
+      ],
+      columns,
+      data: filteredOrders,
+      totalSummary: {
+        label: 'รวมยอดขายสุทธิทั้งหมด (GRAND TOTAL)',
+        values: {
+          itemsCount: `${totalUnitsSold.toLocaleString()} ชิ้น`,
+          total: `฿${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+        },
+      },
+    });
+  };
+
   return (
-    <div className="flex-1 p-4 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
-      {/* Top Banner */}
-      <PosCard className="p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">{t.sales.title}</h1>
-            <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-              {t.sales.subtitle}
-            </p>
-          </div>
-        </div>
-      </PosCard>
+    <PageContainer>
+      {/* Header Banner */}
+      <PageHeader
+        icon={<Receipt className="w-6 h-6" />}
+        title={t.sales.title}
+        subtitle={t.sales.subtitle}
+        actions={
+          <PosButton
+            variantStyle="secondary"
+            onClick={handleExportExcel}
+            startIcon={<Download className="w-4 h-4" />}
+          >
+            {t.common.exportExcel}
+          </PosButton>
+        }
+      />
 
       {/* KPI Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -414,7 +548,7 @@ export const SalesHistoryScreen: React.FC = () => {
       </PosCard>
 
       {/* MOBILE ORDERS LIST (< md) */}
-      <div className="md:hidden space-y-3">
+      <Box sx={{ display: { xs: 'flex', md: 'none' }, flexDirection: 'column', gap: 1.5 }}>
         {filteredOrders.length === 0 ? (
           <PosCard className="p-8 text-center text-slate-400">
             {t.sales.noSalesFound}
@@ -486,10 +620,10 @@ export const SalesHistoryScreen: React.FC = () => {
             );
           })
         )}
-      </div>
+      </Box>
 
       {/* DESKTOP / TABLET ORDERS TABLE (>= md) */}
-      <div className="hidden md:block">
+      <Box sx={{ display: { xs: 'none', md: 'block' } }}>
         <PosTable
           columns={orderColumns}
           data={filteredOrders}
@@ -499,7 +633,7 @@ export const SalesHistoryScreen: React.FC = () => {
           variant="panel"
           minWidth={700}
         />
-      </div>
+      </Box>
 
       {/* MODAL: Order Detail & Reprint Receipt */}
       <Dialog
@@ -507,6 +641,7 @@ export const SalesHistoryScreen: React.FC = () => {
         onClose={() => setSelectedOrder(null)}
         maxWidth="xs"
         fullWidth
+        fullScreen={isMobileScreen}
         slotProps={{
           backdrop: {
             sx: {
@@ -640,6 +775,6 @@ export const SalesHistoryScreen: React.FC = () => {
           </div>
         )}
       </Dialog>
-    </div>
+    </PageContainer>
   );
 };

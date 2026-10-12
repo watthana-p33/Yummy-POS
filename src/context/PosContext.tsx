@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
-import type { Product, CartItem, Order, User, PaymentMethod, Shift, Customer, MenuPermission } from '../types/pos';
-import { INITIAL_PRODUCTS, INITIAL_ORDERS, INITIAL_USERS } from '../data/mockData';
+import type { Product, ProductUnit, CartItem, Order, User, PaymentMethod, Shift, Customer, MenuPermission, Category } from '../types/pos';
+import { getDefaultPermissionsForRole } from '../config/features';
+import { INITIAL_PRODUCTS, INITIAL_ORDERS, INITIAL_USERS, CATEGORIES } from '../data/mockData';
 import { translations, type Language, type TranslationSchema } from '../i18n/translations';
 import {
   ACCENT_THEMES,
@@ -38,10 +39,7 @@ export const hasMenuPermission = (user: User | null, menuId: MenuPermission): bo
   if (user.permissions && Array.isArray(user.permissions)) {
     return user.permissions.includes(menuId);
   }
-  if (user.role === 'manager') {
-    return ['pos', 'products', 'shifts', 'staff', 'sales', 'reports'].includes(menuId);
-  }
-  return ['pos', 'products', 'shifts', 'sales'].includes(menuId);
+  return getDefaultPermissionsForRole(user.role).includes(menuId);
 };
 
 interface PosContextType {
@@ -59,9 +57,9 @@ interface PosContextType {
   deleteProduct: (id: string) => void;
 
   cart: CartItem[];
-  addToCart: (product: Product) => void;
-  removeFromCart: (productId: string) => void;
-  updateCartQuantity: (productId: string, quantity: number) => void;
+  addToCart: (product: Product, unit?: ProductUnit) => void;
+  removeFromCart: (cartItemId: string) => void;
+  updateCartQuantity: (cartItemId: string, quantity: number) => void;
   clearCart: () => void;
 
   discount: number;
@@ -91,6 +89,11 @@ interface PosContextType {
   selectedCustomer: Customer | null;
   setSelectedCustomer: (customer: Customer | null) => void;
   addCustomer: (data: { name: string; phone?: string; email?: string }) => Customer;
+
+  // Categories Management (หมวดหมู่สินค้า)
+  categories: Category[];
+  addCategory: (data: { name: string; icon?: string }) => Category;
+  deleteCategory: (id: string) => void;
 
   themeMode: 'light' | 'dark';
   toggleTheme: () => void;
@@ -178,8 +181,14 @@ export const PosProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Font Family State
   const [fontFamily, setFontFamilyState] = useState<FontFamily>(() => {
+    const version = localStorage.getItem('yummy_pos_font_ver');
+    if (version !== 'comic_relief') {
+      localStorage.setItem('yummy_pos_font_ver', 'comic_relief');
+      localStorage.setItem('yummy_pos_font', 'Comic Relief');
+      return 'Comic Relief';
+    }
     const saved = localStorage.getItem('yummy_pos_font') as FontFamily | null;
-    return saved || 'Prompt';
+    return saved || 'Comic Relief';
   });
 
   // Custom Fonts State (loaded from storage)
@@ -310,7 +319,7 @@ export const PosProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     await removeCustomFontFromStorage(fontId);
     setCustomFonts((prev) => prev.filter((f) => f.id !== fontId));
     if (fontFamily === fontId) {
-      setFontFamily('Prompt');
+      setFontFamily('Comic Relief');
     }
   };
 
@@ -371,12 +380,7 @@ export const PosProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   const registerUser = (userData: { username: string; name: string; role: 'cashier' | 'manager' | 'admin'; avatar?: string; gender?: 'male' | 'female'; permissions?: MenuPermission[] }): User => {
-    const defaultPermissions: MenuPermission[] =
-      userData.role === 'admin'
-        ? ['pos', 'products', 'shifts', 'staff', 'sales', 'reports']
-        : userData.role === 'manager'
-        ? ['pos', 'products', 'shifts', 'staff', 'sales', 'reports']
-        : ['pos', 'products', 'shifts', 'sales'];
+    const defaultPermissions: MenuPermission[] = getDefaultPermissionsForRole(userData.role || 'cashier');
 
     const inferredGender = userData.gender || 'male';
 
@@ -562,9 +566,42 @@ export const PosProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem('yummy_pos_customers', JSON.stringify(customers));
   }, [customers]);
 
+  // Categories Management State
+  const [categories, setCategories] = useState<Category[]>(() => {
+    return safeJsonParse<Category[]>('yummy_pos_categories', CATEGORIES);
+  });
+
+  useEffect(() => {
+    localStorage.setItem('yummy_pos_categories', JSON.stringify(categories));
+  }, [categories]);
+
+  const addCategory = (data: { name: string; icon?: string }): Category => {
+    const slug = data.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const newCat: Category = {
+      id: `cat-${slug || Date.now()}`,
+      name: data.name.trim(),
+      icon: data.icon?.trim() || '🍽️',
+    };
+    setCategories((prev) => [...prev, newCat]);
+    return newCat;
+  };
+
+  const deleteCategory = (id: string) => {
+    if (id === 'all') return;
+    setCategories((prev) => prev.filter((c) => c.id !== id));
+  };
+
   // Products State
   const [products, setProducts] = useState<Product[]>(() => {
-    return safeJsonParse<Product[]>('yummy_pos_products', INITIAL_PRODUCTS);
+    const list = safeJsonParse<Product[]>('yummy_pos_products', INITIAL_PRODUCTS);
+    // Auto-migrate: If any product in INITIAL_PRODUCTS has units but the saved version doesn't, enrich it
+    return list.map((p) => {
+      const init = INITIAL_PRODUCTS.find((i) => i.id === p.id);
+      if (init && init.units && (!p.units || p.units.length === 0)) {
+        return { ...p, baseUnit: init.baseUnit || p.baseUnit || 'ชิ้น', units: init.units };
+      }
+      return p;
+    });
   });
 
   // Cart State
@@ -719,34 +756,76 @@ export const PosProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Cart operations
-  const addToCart = (product: Product) => {
+  const addToCart = (product: Product, unit?: ProductUnit) => {
     if (!currentShift || product.stock <= 0) return;
+    const unitMultiplier = unit?.multiplier || 1;
+    const cartItemId = unit ? `${product.id}-${unit.id}` : `${product.id}-base`;
+
     setCart((prev) => {
-      const existing = prev.find((item) => item.product.id === product.id);
-      if (existing) {
-        if (existing.quantity >= product.stock) return prev;
-        return prev.map((item) =>
-          item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+      // Calculate total base stock already used in cart for this product
+      const currentStockUsed = prev
+        .filter((ci) => ci.product.id === product.id)
+        .reduce((sum, ci) => sum + ci.quantity * (ci.selectedUnit?.multiplier || 1), 0);
+
+      // Verify if remaining stock is enough for another unit
+      if (currentStockUsed + unitMultiplier > product.stock) {
+        return prev;
+      }
+
+      const existingIndex = prev.findIndex(
+        (item) =>
+          item.id === cartItemId ||
+          (item.product.id === product.id &&
+            ((!item.selectedUnit && !unit) || item.selectedUnit?.id === unit?.id))
+      );
+
+      if (existingIndex >= 0) {
+        return prev.map((item, idx) =>
+          idx === existingIndex ? { ...item, id: cartItemId, quantity: item.quantity + 1 } : item
         );
       }
-      return [...prev, { product, quantity: 1 }];
+
+      return [
+        ...prev,
+        {
+          id: cartItemId,
+          product,
+          quantity: 1,
+          selectedUnit: unit,
+        },
+      ];
     });
   };
 
-  const removeFromCart = (productId: string) => {
-    setCart((prev) => prev.filter((item) => item.product.id !== productId));
+  const removeFromCart = (cartItemId: string) => {
+    setCart((prev) =>
+      prev.filter(
+        (item) =>
+          item.id !== cartItemId &&
+          item.product.id !== cartItemId &&
+          `${item.product.id}-${item.selectedUnit?.id || 'base'}` !== cartItemId
+      )
+    );
   };
 
-  const updateCartQuantity = (productId: string, quantity: number) => {
+  const updateCartQuantity = (cartItemId: string, quantity: number) => {
     if (quantity <= 0) {
-      removeFromCart(productId);
+      removeFromCart(cartItemId);
       return;
     }
     setCart((prev) =>
       prev.map((item) => {
-        if (item.product.id === productId) {
-          const validQty = Math.min(quantity, item.product.stock);
-          return { ...item, quantity: validQty };
+        const lineId =
+          item.id ||
+          (item.selectedUnit ? `${item.product.id}-${item.selectedUnit.id}` : `${item.product.id}-base`);
+        if (lineId === cartItemId || item.product.id === cartItemId) {
+          const mult = item.selectedUnit?.multiplier || 1;
+          const otherLinesUsed = prev
+            .filter((other) => other.product.id === item.product.id && other !== item)
+            .reduce((sum, other) => sum + other.quantity * (other.selectedUnit?.multiplier || 1), 0);
+          const maxAllowed = Math.floor((item.product.stock - otherLinesUsed) / mult);
+          const validQty = Math.max(1, Math.min(quantity, maxAllowed));
+          return { ...item, id: lineId, quantity: validQty };
         }
         return item;
       })
@@ -764,7 +843,10 @@ export const PosProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Calculations
-  const subtotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const subtotal = cart.reduce(
+    (sum, item) => sum + (item.selectedUnit ? item.selectedUnit.price : item.product.price) * item.quantity,
+    0
+  );
 
   const calculatedDiscount =
     discountType === 'percent'
@@ -788,13 +870,20 @@ export const PosProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
     const receiptNumber = `REC-${todayStr}-${randomSuffix}`;
 
-    const orderItems = cart.map((c) => ({
-      productId: c.product.id,
-      name: c.product.name,
-      price: c.product.price,
-      quantity: c.quantity,
-      subtotal: c.product.price * c.quantity,
-    }));
+    const orderItems = cart.map((c) => {
+      const price = c.selectedUnit ? c.selectedUnit.price : c.product.price;
+      const unitName = c.selectedUnit ? c.selectedUnit.name : (c.product.baseUnit || 'ชิ้น');
+      const displayName = c.selectedUnit ? `${c.product.name} [${c.selectedUnit.name}]` : c.product.name;
+      return {
+        productId: c.product.id,
+        name: displayName,
+        price,
+        quantity: c.quantity,
+        subtotal: price * c.quantity,
+        unitName,
+        unitMultiplier: c.selectedUnit ? c.selectedUnit.multiplier : 1,
+      };
+    });
 
     const received = amountReceived !== undefined ? amountReceived : total;
     const change = Math.max(0, Number((received - total).toFixed(2)));
@@ -845,12 +934,16 @@ export const PosProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     }
 
-    // Deduct stocks
+    // Deduct stocks in base units
     setProducts((prev) =>
       prev.map((prod) => {
-        const cartItem = cart.find((ci) => ci.product.id === prod.id);
-        if (cartItem) {
-          const newStock = Math.max(0, prod.stock - cartItem.quantity);
+        const cartItemsForProd = cart.filter((ci) => ci.product.id === prod.id);
+        if (cartItemsForProd.length > 0) {
+          const totalUnitsToDeduct = cartItemsForProd.reduce(
+            (sum, ci) => sum + ci.quantity * (ci.selectedUnit?.multiplier || 1),
+            0
+          );
+          const newStock = Math.max(0, prod.stock - totalUnitsToDeduct);
           let newStatus = prod.status;
           if (newStock <= 0) newStatus = 'out_of_stock';
           else if (newStock < 10) newStatus = 'low_stock';
@@ -920,6 +1013,9 @@ export const PosProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         selectedCustomer,
         setSelectedCustomer,
         addCustomer,
+        categories,
+        addCategory,
+        deleteCategory,
         themeMode,
         toggleTheme,
         accentColor,

@@ -234,6 +234,7 @@ export interface FontOption {
 }
 
 export const PRESET_FONT_OPTIONS: FontOption[] = [
+  { id: 'Comic Relief', label: 'Comic Relief', sample: 'ฟอนต์น่ารัก มีชีวิตชีวา สดใส ลายมือกึ่งแคชชวล', source: 'preset' },
   { id: 'Prompt', label: 'Prompt (พร้อมพท์)', sample: 'ฟอนต์เรียบหรู ทันสมัย สบายตา', source: 'preset' },
   { id: 'Kanit', label: 'Kanit (คณิต)', sample: 'ฟอนต์กลม มินิมอล โมเดิร์น', source: 'preset' },
   { id: 'Sarabun', label: 'Sarabun (สารบัญ)', sample: 'ฟอนต์ทางการ คมชัด ชัดเจน', source: 'preset' },
@@ -289,7 +290,7 @@ if (typeof document !== 'undefined') {
 export const getDesignTokens = (
   mode: ThemeMode,
   accent: AccentColor = 'sage',
-  font: FontFamily = 'Prompt'
+  font: FontFamily = 'Comic Relief'
 ) => {
   const accentTheme = ACCENT_THEMES[accent] || ACCENT_THEMES.sage;
   const primaryColor = mode === 'dark' ? accentTheme.primaryDark : accentTheme.primaryLight;
@@ -455,7 +456,7 @@ export const getDesignTokens = (
 export const createAppTheme = (
   mode: ThemeMode = 'light',
   accent: AccentColor = 'sage',
-  font: FontFamily = 'Prompt'
+  font: FontFamily = 'Comic Relief'
 ): Theme => {
   return createTheme(getDesignTokens(mode, accent, font));
 };

@@ -7,3 +7,7 @@ export * from './ShiftModal';
 export * from './SettingsModal';
 export * from './LiquidBackground';
 export * from './PosTable';
+export * from './CustomerSearchDialog';
+export * from './AddCategoryModal';
+export * from './PageHeader';
+export * from './PosLabelAction';

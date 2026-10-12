@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { usePos } from '../context/PosContext';
-import type { Shift } from '../types/pos';
+import { usePos } from '../../context/PosContext';
+import type { Shift } from '../../types/pos';
+import { exportStyledExcel, type ExcelColumn } from '../../utils/excelExport';
 import {
   Clock,
   Unlock,
@@ -10,8 +11,17 @@ import {
   Receipt,
   DollarSign,
   TrendingUp,
+  Download,
 } from 'lucide-react';
-import { PosCard, PosTable, type PosTableColumn, ShiftModal } from './common';
+import {
+  PosCard,
+  PosButton,
+  PosTable,
+  type PosTableColumn,
+  ShiftModal,
+  PageHeader,
+  PageContainer,
+} from '../common';
 
 export const ShiftScreen: React.FC = () => {
   const { currentShift, shifts, themeMode, t } = usePos();
@@ -131,53 +141,142 @@ export const ShiftScreen: React.FC = () => {
     },
   ];
 
-  return (
-    <div className="p-4 md:p-6 lg:p-8 space-y-6 min-h-screen bg-transparent">
-      {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-800 dark:text-slate-100 flex items-center gap-3">
-            <span
-              className="p-2.5 rounded-2xl text-white shadow-md relative overflow-hidden liquid-gloss"
-              style={{
-                background: `linear-gradient(135deg, var(--theme-primary), var(--theme-primary-hover))`,
-                boxShadow: `0 6px 18px -3px var(--theme-primary)`,
-              }}
-            >
-              <Clock className="w-6 h-6" />
-            </span>
-            {t.sidebar.shiftsTab}
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            {t.sidebar.shiftsSub}
-          </p>
-        </div>
+  const handleExportExcel = () => {
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
+    const totalShiftSales = shifts.reduce((sum, s) => sum + s.totalSales, 0);
+    const totalStartingCash = shifts.reduce((sum, s) => sum + s.startingCash, 0);
 
-        {/* Quick Shift Action Button */}
-        <div>
-          {currentShift ? (
-            <button
-              onClick={() => setShiftModalMode('close')}
-              className="px-4 py-2.5 bg-[#e58a74] hover:bg-[#d67963] text-white rounded-2xl text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-2 shadow-xs active:scale-95"
+    const columns: ExcelColumn<Shift>[] = [
+      {
+        key: 'cashierName',
+        header: 'พนักงานขาย (Cashier)',
+        width: 20,
+        align: 'left',
+      },
+      {
+        key: 'date',
+        header: 'วันที่ (Date)',
+        width: 16,
+        align: 'center',
+        formatter: (_v, s) => new Date(s.startTime).toLocaleDateString('th-TH'),
+      },
+      {
+        key: 'startTime',
+        header: 'เวลาเปิดกะ (Open Time)',
+        width: 16,
+        align: 'center',
+        formatter: (_v, s) => new Date(s.startTime).toLocaleTimeString('th-TH'),
+      },
+      {
+        key: 'endTime',
+        header: 'เวลาปิดกะ (Close Time)',
+        width: 16,
+        align: 'center',
+        formatter: (_v, s) => (s.endTime ? new Date(s.endTime).toLocaleTimeString('th-TH') : '-'),
+      },
+      {
+        key: 'startingCash',
+        header: 'เงินทอนเริ่มต้น (Starting Cash THB)',
+        width: 22,
+        align: 'right',
+        formatter: (v) => `฿${Number(v).toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+      },
+      {
+        key: 'totalSales',
+        header: 'ยอดขายในกะ (Shift Sales THB)',
+        width: 22,
+        align: 'right',
+        formatter: (v) => `฿${Number(v).toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+      },
+      {
+        key: 'endingCash',
+        header: 'เงินสดนับได้ (Ending Cash THB)',
+        width: 22,
+        align: 'right',
+        formatter: (v) =>
+          v !== undefined ? `฿${Number(v).toLocaleString(undefined, { minimumFractionDigits: 2 })}` : '-',
+      },
+      {
+        key: 'status',
+        header: 'สถานะกะ (Shift Status)',
+        width: 18,
+        align: 'center',
+        formatter: (v) => (v === 'open' ? 'เปิดอยู่ (Open)' : 'ปิดแล้ว (Closed)'),
+      },
+    ];
+
+    exportStyledExcel({
+      fileName: `YummyPOS_Shifts_${dateStr}.xlsx`,
+      sheetName: 'Shifts',
+      title: `⏱️ ${t.common.appName || 'YUMMY POS'} — รายงานประวัติกะการขาย (SHIFT HISTORY)`,
+      subtitle: `สาขา: ${t.pos?.storeBranch || 'สาขาหลัก Central Food Court'}   |   วันที่ออกรายงาน: ${now.toLocaleDateString('th-TH')} ${now.toLocaleTimeString('th-TH')}`,
+      kpiCards: [
+        {
+          title: '⏱️ จำนวนกะทั้งหมด (TOTAL SHIFTS)',
+          value: `${shifts.length} กะ`,
+        },
+        {
+          title: '💰 ยอดขายสะสมทุกกะ (TOTAL SHIFT SALES)',
+          value: `฿${totalShiftSales.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+        },
+        {
+          title: '💵 ยอดเงินสดเริ่มต้นรวม (TOTAL STARTING CASH)',
+          value: `฿${totalStartingCash.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+        },
+      ],
+      columns,
+      data: shifts,
+      totalSummary: {
+        label: 'รวมยอดทั้งหมด (GRAND TOTAL)',
+        values: {
+          startingCash: `฿${totalStartingCash.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+          totalSales: `฿${totalShiftSales.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+        },
+      },
+    });
+  };
+
+  return (
+    <PageContainer>
+      {/* Header Banner */}
+      <PageHeader
+        icon={<Clock className="w-6 h-6" />}
+        title={t.sidebar.shiftsTab}
+        subtitle={t.sidebar.shiftsSub}
+        actions={
+          <>
+            <PosButton
+              variantStyle="secondary"
+              onClick={handleExportExcel}
+              startIcon={<Download className="w-4 h-4" />}
             >
-              <Lock className="w-4 h-4" />
-              {t.staff.closeShiftBtn}
-            </button>
-          ) : (
-            <button
-              onClick={() => setShiftModalMode('open')}
-              className="px-4 py-2.5 text-white rounded-2xl text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-2 shadow-xs active:scale-95 hover:opacity-90"
-              style={{
-                backgroundColor: 'var(--theme-primary)',
-                boxShadow: '0 4px 14px var(--theme-primary-border)',
-              }}
-            >
-              <Unlock className="w-4 h-4" />
-              {t.staff.openShiftBtn}
-            </button>
-          )}
-        </div>
-      </div>
+              {t.common.exportExcel}
+            </PosButton>
+            {currentShift ? (
+              <button
+                onClick={() => setShiftModalMode('close')}
+                className="px-4 py-2.5 bg-[#e58a74] hover:bg-[#d67963] text-white rounded-2xl text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-2 shadow-xs active:scale-95"
+              >
+                <Lock className="w-4 h-4" />
+                {t.staff.closeShiftBtn}
+              </button>
+            ) : (
+              <button
+                onClick={() => setShiftModalMode('open')}
+                className="px-4 py-2.5 text-white rounded-2xl text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-2 shadow-xs active:scale-95 hover:opacity-90"
+                style={{
+                  backgroundColor: 'var(--theme-primary)',
+                  boxShadow: '0 4px 14px var(--theme-primary-border)',
+                }}
+              >
+                <Unlock className="w-4 h-4" />
+                {t.staff.openShiftBtn}
+              </button>
+            )}
+          </>
+        }
+      />
 
       {/* Active Shift Status Card */}
       <PosCard className="p-5 sm:p-6 border">
@@ -316,6 +415,6 @@ export const ShiftScreen: React.FC = () => {
           onClose={() => setShiftModalMode(null)}
         />
       )}
-    </div>
+    </PageContainer>
   );
 };

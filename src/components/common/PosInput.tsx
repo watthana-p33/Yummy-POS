@@ -1,12 +1,28 @@
 import React from 'react';
 import { TextField as MuiTextField, type TextFieldProps } from '@mui/material';
 
-export const PosInput: React.FC<TextFieldProps> = ({ sx, slotProps, ...props }) => {
-  return (
+export type PosInputProps = TextFieldProps & {
+  outsideLabel?: boolean;
+  labelRight?: React.ReactNode;
+};
+
+export const PosInput: React.FC<PosInputProps> = ({
+  sx,
+  slotProps,
+  label,
+  outsideLabel = false,
+  labelRight,
+  required,
+  fullWidth = true,
+  ...props
+}) => {
+  const inputElement = (
     <MuiTextField
       size="medium"
       variant="outlined"
-      fullWidth
+      fullWidth={fullWidth}
+      required={required}
+      label={outsideLabel ? undefined : label}
       slotProps={{
         ...slotProps,
         inputLabel: {
@@ -77,4 +93,27 @@ export const PosInput: React.FC<TextFieldProps> = ({ sx, slotProps, ...props }) 
       {...props}
     />
   );
+
+  if (outsideLabel && (label || labelRight)) {
+    const isString = typeof label === 'string';
+    const hasAsterisk = isString && label.trim().endsWith('*');
+    const cleanLabel = isString && required && hasAsterisk ? label.replace(/\s*\*+$/, '') : label;
+
+    return (
+      <div className={fullWidth ? 'w-full' : 'inline-block'}>
+        <div className="flex items-center justify-between mb-1.5">
+          {label && (
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+              {cleanLabel}
+              {required && <span className="text-rose-500 ml-0.5">*</span>}
+            </label>
+          )}
+          {labelRight}
+        </div>
+        {inputElement}
+      </div>
+    );
+  }
+
+  return inputElement;
 };

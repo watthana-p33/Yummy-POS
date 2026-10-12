@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { usePos } from '../context/PosContext';
-import type { Order } from '../types/pos';
-import { PosCard } from './common';
-import { ACCENT_THEMES } from '../theme/theme';
+import { usePos } from '../../context/PosContext';
+import type { Order } from '../../types/pos';
+import { PosCard } from '../common';
+import { ACCENT_THEMES } from '../../theme/theme';
 import { BarChart, PieChart } from '@mui/x-charts';
 import {
   TrendingUp,

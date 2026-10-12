@@ -5,7 +5,7 @@ import { defineConfig } from "vite";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: "/yummy-pos/",
+  base: "/Yummy-POS/",
   server: {
     proxy: {
       "/api": {

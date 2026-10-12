@@ -1,13 +1,14 @@
 import React, { useState, useMemo } from 'react';
-import { usePos } from '../context/PosContext';
-import * as XLSX from 'xlsx';
+import { usePos } from '../../context/PosContext';
+import { exportSalesReportToExcel } from '../../utils/excelExport';
 import {
-  FileSpreadsheet,
+  ScrollText,
   Calendar,
   Filter,
   Download,
   CheckSquare,
   Square,
+  X,
 } from 'lucide-react';
 import {
   Table,
@@ -15,15 +16,53 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  MenuItem,
 } from '@mui/material';
-import { PosCard, PosTableContainer } from './common';
+import { PosCard, PosTableContainer, PosSelect, PageHeader, PageContainer } from '../common';
+
+const CURRENT_YEAR = String(new Date().getFullYear());
 
 export const ReportsScreen: React.FC = () => {
-  const { orders, products, themeMode, t } = usePos();
+  const { orders, products, themeMode, t, language } = usePos();
   const isDark = themeMode === 'dark';
 
   const [periodType, setPeriodType] = useState<'monthly' | 'yearly'>('monthly');
+  const [selectedYear, setSelectedYear] = useState<string>('all');
+  const [selectedMonth, setSelectedMonth] = useState<string>('all');
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]); // Empty = All products
+
+  // Available years from existing orders + current year
+  const availableYears = useMemo(() => {
+    const yearsSet = new Set<string>();
+    orders.forEach((o) => {
+      if (o.timestamp) {
+        const d = new Date(o.timestamp);
+        if (!isNaN(d.getTime())) {
+          yearsSet.add(String(d.getFullYear()));
+        }
+      }
+    });
+    yearsSet.add(CURRENT_YEAR);
+    return Array.from(yearsSet).sort((a, b) => b.localeCompare(a));
+  }, [orders]);
+
+  const monthOptions = useMemo(
+    () => [
+      { value: '01', labelTh: '01 - มกราคม', labelEn: '01 - January' },
+      { value: '02', labelTh: '02 - กุมภาพันธ์', labelEn: '02 - February' },
+      { value: '03', labelTh: '03 - มีนาคม', labelEn: '03 - March' },
+      { value: '04', labelTh: '04 - เมษายน', labelEn: '04 - April' },
+      { value: '05', labelTh: '05 - พฤษภาคม', labelEn: '05 - May' },
+      { value: '06', labelTh: '06 - มิถุนายน', labelEn: '06 - June' },
+      { value: '07', labelTh: '07 - กรกฎาคม', labelEn: '07 - July' },
+      { value: '08', labelTh: '08 - สิงหาคม', labelEn: '08 - August' },
+      { value: '09', labelTh: '09 - กันยายน', labelEn: '09 - September' },
+      { value: '10', labelTh: '10 - ตุลาคม', labelEn: '10 - October' },
+      { value: '11', labelTh: '11 - พฤศจิกายน', labelEn: '11 - November' },
+      { value: '12', labelTh: '12 - ธันวาคม', labelEn: '12 - December' },
+    ],
+    []
+  );
 
   const toggleProductSelect = (id: string) => {
     setSelectedProductIds((prev) =>
@@ -35,7 +74,7 @@ export const ReportsScreen: React.FC = () => {
     setSelectedProductIds([]);
   };
 
-  // Group orders by month (YYYY-MM) or year (YYYY)
+  // Group orders by month (YYYY-MM) or year (YYYY) filtered by selectedYear & selectedMonth
   const reportData = useMemo(() => {
     const summaryMap: Record<
       string,
@@ -50,10 +89,23 @@ export const ReportsScreen: React.FC = () => {
 
     orders.forEach((order) => {
       const date = new Date(order.timestamp);
+      const orderYear = String(date.getFullYear());
+      const orderMonth = String(date.getMonth() + 1).padStart(2, '0');
+
+      // Filter by selected year
+      if (selectedYear !== 'all' && orderYear !== selectedYear) {
+        return;
+      }
+
+      // Filter by selected month (only applicable in monthly view mode)
+      if (periodType === 'monthly' && selectedMonth !== 'all' && orderMonth !== selectedMonth) {
+        return;
+      }
+
       const periodKey =
         periodType === 'monthly'
-          ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-          : `${date.getFullYear()}`;
+          ? `${orderYear}-${orderMonth}`
+          : `${orderYear}`;
 
       if (!summaryMap[periodKey]) {
         summaryMap[periodKey] = {
@@ -94,7 +146,7 @@ export const ReportsScreen: React.FC = () => {
     });
 
     return Object.values(summaryMap).sort((a, b) => b.period.localeCompare(a.period));
-  }, [orders, periodType, selectedProductIds]);
+  }, [orders, periodType, selectedYear, selectedMonth, selectedProductIds]);
 
   const totalFilteredRevenue = useMemo(() => {
     return reportData.reduce((sum, r) => sum + r.revenue, 0);
@@ -104,106 +156,149 @@ export const ReportsScreen: React.FC = () => {
     return reportData.reduce((sum, r) => sum + r.totalQty, 0);
   }, [reportData]);
 
-  // Export to Excel using xlsx library
+  const totalOrdersCount = useMemo(() => {
+    return reportData.reduce((sum, r) => sum + r.orderCount, 0);
+  }, [reportData]);
+
+  // Export to Excel with custom Yummy POS theme styling and current filters
   const handleExportExcel = () => {
-    const excelRows: any[] = [];
-
-    reportData.forEach((r) => {
-      // Add summary line
-      excelRows.push({
-        [t.reports.excelPeriod]: r.period,
-        [t.reports.excelOrders]: r.orderCount,
-        [t.reports.excelUnits]: r.totalQty,
-        [t.reports.excelRevenue]: r.revenue,
-      });
-
-      // Add breakdown lines for items
-      Object.values(r.productBreakdown).forEach((item) => {
-        excelRows.push({
-          [t.reports.excelPeriod]: `  ↳ ${item.name}`,
-          [t.reports.excelOrders]: '',
-          [t.reports.excelUnits]: item.qty,
-          [t.reports.excelRevenue]: item.revenue,
-        });
-      });
+    exportSalesReportToExcel({
+      periodType,
+      reportData,
+      totalFilteredRevenue,
+      totalFilteredUnits,
+      totalOrdersCount,
+      currency: t.common.currency || '฿',
+      storeName: t.common.appName || 'Yummy POS',
+      branchName: t.pos?.storeBranch || 'สาขาหลัก Central Food Court',
+      filterYear: selectedYear,
+      filterMonth: periodType === 'monthly' ? selectedMonth : 'all',
     });
-
-    const worksheet = XLSX.utils.json_to_sheet(excelRows);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'SalesReport');
-
-    const fileName = `YummyPOS_Sales_Report_${periodType}_${Date.now()}.xlsx`;
-    XLSX.writeFile(workbook, fileName);
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 space-y-6 min-h-screen bg-transparent">
+    <PageContainer>
       {/* Top Banner Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-800 dark:text-slate-100 flex items-center gap-3">
-            <span
-              className="p-2.5 rounded-2xl text-white shadow-md relative overflow-hidden liquid-gloss"
-              style={{
-                background: `linear-gradient(135deg, var(--theme-primary), var(--theme-primary-hover))`,
-                boxShadow: `0 6px 18px -3px var(--theme-primary)`,
-              }}
-            >
-              <FileSpreadsheet className="w-6 h-6" />
-            </span>
-            {t.reports.title}
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            {t.reports.subtitle}
-          </p>
-        </div>
-
-        {/* Export Excel Button */}
-        <button
-          onClick={handleExportExcel}
-          className="px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold transition active:scale-95 cursor-pointer flex items-center gap-2 text-white shadow-md relative overflow-hidden liquid-gloss"
-          style={{
-            background: `linear-gradient(135deg, var(--theme-primary), var(--theme-primary-hover))`,
-            boxShadow: `0 6px 20px -3px var(--theme-primary)`,
-          }}
-        >
-          <Download className="w-4 h-4" />
-          {t.reports.exportExcelBtn}
-        </button>
-      </div>
+      <PageHeader
+        icon={<ScrollText className="w-6 h-6" />}
+        title={t.reports.title}
+        subtitle={t.reports.subtitle}
+        actions={
+          <button
+            onClick={handleExportExcel}
+            className="px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold transition active:scale-95 cursor-pointer flex items-center gap-2 text-white shadow-md relative overflow-hidden liquid-gloss"
+            style={{
+              background: `linear-gradient(135deg, var(--theme-primary), var(--theme-primary-hover))`,
+              boxShadow: `0 6px 20px -3px var(--theme-primary)`,
+            }}
+          >
+            <Download className="w-4 h-4" />
+            {t.reports.exportExcelBtn}
+          </button>
+        }
+      />
 
       {/* Control Filters Bar */}
       <PosCard className="p-5 border space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-black/5 dark:border-white/10">
-          {/* Monthly / Yearly Switcher */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{t.reports.viewMode}:</span>
-            <div className="flex items-center p-1 rounded-xl border liquid-glass-panel">
-              <button
-                onClick={() => setPeriodType('monthly')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
-                  periodType === 'monthly'
-                    ? 'bg-white/80 dark:bg-white/20 text-slate-900 dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10'
-                    : 'text-slate-600 dark:text-slate-400'
-                }`}
-              >
-                {t.reports.monthlySummary}
-              </button>
-              <button
-                onClick={() => setPeriodType('yearly')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
-                  periodType === 'yearly'
-                    ? 'bg-white/80 dark:bg-white/20 text-slate-900 dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10'
-                    : 'text-slate-600 dark:text-slate-400'
-                }`}
-              >
-                {t.reports.yearlySummary}
-              </button>
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-4 border-b border-black/5 dark:border-white/10">
+          {/* Controls: Mode switcher + Year selector + Month selector */}
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Monthly / Yearly Switcher */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                {t.reports.viewMode}:
+              </span>
+              <div className="flex items-center h-[38px] p-1 rounded-xl border liquid-glass-panel box-border">
+                <button
+                  type="button"
+                  onClick={() => setPeriodType('monthly')}
+                  className={`h-full flex items-center px-3 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                    periodType === 'monthly'
+                      ? 'bg-white/80 dark:bg-white/20 text-slate-900 dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  {t.reports.monthlySummary}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPeriodType('yearly')}
+                  className={`h-full flex items-center px-3 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                    periodType === 'yearly'
+                      ? 'bg-white/80 dark:bg-white/20 text-slate-900 dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  {t.reports.yearlySummary}
+                </button>
+              </div>
             </div>
+
+            {/* Year Selector */}
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                {t.reports.selectYear}:
+              </span>
+              <div className="w-36">
+                <PosSelect
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(e.target.value as string)}
+                  size="small"
+                  sx={{ height: '38px', minHeight: '38px' }}
+                >
+                  <MenuItem value="all">{t.reports.allYears}</MenuItem>
+                  {availableYears.map((yr) => (
+                    <MenuItem key={yr} value={yr}>
+                      {yr}
+                    </MenuItem>
+                  ))}
+                </PosSelect>
+              </div>
+            </div>
+
+            {/* Month Selector (shown in monthly mode) */}
+            {periodType === 'monthly' && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                  {t.reports.selectMonth}:
+                </span>
+                <div className="w-48">
+                  <PosSelect
+                    value={selectedMonth}
+                    onChange={(e) => setSelectedMonth(e.target.value as string)}
+                    size="small"
+                    sx={{ height: '38px', minHeight: '38px' }}
+                  >
+                    <MenuItem value="all">{t.reports.allMonths}</MenuItem>
+                    {monthOptions.map((m) => (
+                      <MenuItem key={m.value} value={m.value}>
+                        {language === 'th' ? m.labelTh : m.labelEn}
+                      </MenuItem>
+                    ))}
+                  </PosSelect>
+                </div>
+              </div>
+            )}
+
+            {/* Reset / Clear Filters button */}
+            {(selectedYear !== 'all' || (periodType === 'monthly' && selectedMonth !== 'all')) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedYear('all');
+                  setSelectedMonth('all');
+                }}
+                className="h-[38px] px-2.5 rounded-xl text-xs font-semibold text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 hover:bg-rose-500/10 transition cursor-pointer flex items-center gap-1 box-border"
+                title={t.reports.clearFilters}
+              >
+                <X className="w-3.5 h-3.5" />
+                <span>{t.reports.clearFilters}</span>
+              </button>
+            )}
           </div>
 
           {/* KPI Summary badges */}
-          <div className="flex items-center gap-4 text-xs font-semibold">
+          <div className="flex items-center gap-4 text-xs font-semibold shrink-0">
             <div className="flex items-center gap-2">
               <span className="text-slate-500 dark:text-slate-400">{t.reports.unitsSoldLabel}:</span>
               <span
@@ -399,6 +494,6 @@ export const ReportsScreen: React.FC = () => {
           </Table>
         </PosTableContainer>
       </PosCard>
-    </div>
+    </PageContainer>
   );
 };

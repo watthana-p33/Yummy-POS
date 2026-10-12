@@ -41,10 +41,15 @@ export const INITIAL_PRODUCTS: Product[] = [
     name: 'ชาไทยเย็นพรีเมียม (Thai Tea)',
     category: 'drinks',
     price: 60,
-    stock: 35,
+    stock: 54,
     status: 'in_stock',
     barcode: '8850003',
     image: 'https://images.unsplash.com/photo-1558857563-b37cf5a23055?auto=format&fit=crop&w=400&q=80',
+    baseUnit: 'ขวด',
+    units: [
+      { id: 'unit-pack-6', name: 'แพ็ค (6 ขวด)', multiplier: 6, price: 330, barcode: '8850003-P6' },
+      { id: 'unit-crate-24', name: 'ลัง (24 ขวด)', multiplier: 24, price: 1250, barcode: '8850003-C24' },
+    ],
   },
   {
     id: 'prod-004',

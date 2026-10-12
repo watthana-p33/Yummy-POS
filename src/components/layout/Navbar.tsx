@@ -1,8 +1,8 @@
 import React from 'react';
-import { usePos } from '../context/PosContext';
+import { usePos } from '../../context/PosContext';
 import { Store, ShoppingCart, Package, BarChart3, LogOut, Clock, Sun, Moon } from 'lucide-react';
-import manAvatar from '../assets/man.png';
-import womanAvatar from '../assets/woman.jpg';
+import manAvatar from '../../assets/man.png';
+import womanAvatar from '../../assets/woman.jpg';
 
 interface NavbarProps {
   currentTab: 'pos' | 'products' | 'sales';

@@ -1,0 +1,137 @@
+export const landingTh = {
+  navFeatures: "จุดเด่นระบบ",
+  navWorkflow: "ขั้นตอนการทำงาน",
+  navRoles: "สิทธิ์การใช้งาน",
+  navStats: "ภาพรวมระบบ",
+  signInBtn: "เข้าสู่ระบบ (Sign In)",
+  launchPosBtn: "เข้าสู่ POS ทันที",
+  continueAs: "ใช้งานต่อในชื่อ",
+  heroBadge: " ระบบจัดการร้านอาหาร & คาเฟ่อัจฉริยะ",
+  heroTitlePrefix: "ยกระดับการขาย & บริหารร้าน ด้วย",
+  heroTitleHighlight: "Yummy POS",
+  heroSubtitle:
+    "ระบบ Point of Sale ครบวงจร คิดเงินเร็วใน 0.4 วินาที ตัดสต็อกอัตโนมัติ สรุปกะการขายไร้ข้อผิดพลาด พร้อมกราฟวิเคราะห์ยอดขายและกำไรแบบเรียลไทม์",
+  ctaStart: "เข้าสู่ระบบ POS (Sign In)",
+  ctaExplore: "สำรวจฟังก์ชันทั้งหมด",
+  stat1Number: "0.4s",
+  stat1Label: "คิดเงินรวดเร็วฉับไว",
+  stat2Number: "100%",
+  stat2Label: "ตัดสต็อกแม่นยำเรียลไทม์",
+  stat3Number: "6 ระดับ",
+  stat3Label: "ควบคุมสิทธิ์พนักงานอิสระ",
+  stat4Number: "Instant",
+  stat4Label: "ส่งออกรายงาน Excel ทันที",
+  liveDemoTitle: "หน้าจอจำลองการทำงานจริง (Live Preview)",
+  liveShiftStatus: "สถานะกะ: เปิดอยู่",
+  liveShiftCashier: "สมชาย ตั้งใจขาย",
+  liveSalesToday: "ยอดขายวันนี้",
+  featuresTitle: "ฟังก์ชันทรงพลังที่ช่วยให้ร้านคุณเติบโต",
+  featuresSubtitle:
+    "ออกแบบทุกเมนูเพื่อตอบโจทย์การทำงานจริงของร้านอาหาร คาเฟ่ และร้านค้าปลีก",
+  feat1Title: "ระบบขายหน้าร้าน (Smart POS)",
+  feat1Desc:
+    "สแกนบาร์โค้ด ค้นหาเร็ว คำนวณภาษี VAT 7% และส่วนลดอัตโนมัติ รองรับ PromptPay QR, เงินสด, บัตรเครดิต",
+  feat2Title: "คลังสินค้า & สต็อกเรียลไทม์",
+  feat2Desc:
+    "ตัดสต็อกทันทีเมื่อปิดบิล แจ้งเตือนสินค้าใกล้หมด (Low Stock) และสินค้าหมดสต็อก พร้อมระบบค้นหาละเอียด",
+  feat3Title: "ระบบกะ & ลิ้นชักเงินสด (Shift)",
+  feat3Desc:
+    "บันทึกเงินสดเริ่มต้น นับเงินปิดกะ และคำนวณส่วนต่างเงินสด ป้องกันเงินรั่วไหล ตรวจสอบความถูกต้องทุกวัน",
+  feat4Title: "จัดการพนักงาน & โปรไฟล์แยกเพศ",
+  feat4Desc:
+    "แบ่งตำแหน่ง Cashier, Manager, Admin ควบคุมสิทธิ์การเข้าถึงเมนู พร้อมรูปโปรไฟล์แยกตามเพศ (ชาย/หญิง)",
+  feat5Title: "กราฟวิเคราะห์ยอดขาย (MUI Charts)",
+  feat5Desc:
+    "วิเคราะห์แนวโน้มยอดขาย กำไรสุทธิ สัดส่วนช่องทางชำระเงิน และ 5 อันดับสินค้าขายดี พร้อมสลับช่วงเวลา",
+  feat6Title: "รายงานสรุป & ส่งออก Excel",
+  feat6Desc:
+    "ดูประวัติการขายย้อนหลัง พิมพ์ใบเสร็จใหม่ และส่งออกข้อมูลเป็นไฟล์ Excel (.xlsx) ครบทุกมิติในคลิกเดียว",
+  workflowTitle: "4 ขั้นตอนง่ายๆ ในการบริหารร้าน",
+  workflowSubtitle:
+    "ขั้นตอนการทำงานที่ลื่นไหล รองรับทั้งพนักงานใหม่และผู้ดูแลร้านมืออาชีพ",
+  step1Title: "1. เปิดกะการขาย",
+  step1Desc: "ระบุเงินสดเริ่มต้นในลิ้นชักเพื่อเริ่มรับออร์เดอร์",
+  step2Title: "2. รับออร์เดอร์ & คิดเงิน",
+  step2Desc: "กดเลือกสินค้า คิดเงินผ่าน PromptPay หรือเงินสดในไม่กี่วินาที",
+  step3Title: "3. ระบบตัดสต็อก & บันทึกบิล",
+  step3Desc: "คลังสินค้าลดลงทันที บันทึกประวัติและคะแนนสมาชิกลูกค้า",
+  step4Title: "4. ปิดกะ & ส่งออกรายงาน",
+  step4Desc: "นับเงินปิดกะ ตรวจสอบยอดขาย และส่งออกสรุป Excel",
+  readyTitle: "พร้อมยกระดับร้านค้าของคุณแล้วหรือยัง?",
+  readySubtitle:
+    "เข้าสู่ระบบ Yummy POS ได้ทันทีผ่านเว็บบราวเซอร์ ไม่ต้องลงโปรแกรมเพิ่ม ใช้งานได้ทุกอุปกรณ์",
+  getStartedBtn: "เข้าสู่ระบบเพื่อเริ่มใช้งาน (Sign In)",
+  footerDesc:
+    "ระบบ Point of Sale อัจฉริยะสำหรับร้านอาหาร คาเฟ่ และธุรกิจค้าปลีกยุคใหม่",
+  allRightsReserved: "สงวนลิขสิทธิ์ทั้งหมด",
+};
+
+export const landingEn = {
+  navFeatures: "Features",
+  navWorkflow: "Workflow",
+  navRoles: "Roles & Permissions",
+  navStats: "System Overview",
+  signInBtn: "Sign In to POS",
+  launchPosBtn: "Launch POS Now",
+  continueAs: "Continue as",
+  heroBadge: " Intelligent Restaurant & Cafe POS System",
+  heroTitlePrefix: "Elevate Your Sales & Operations with",
+  heroTitleHighlight: "Yummy POS",
+  heroSubtitle:
+    "Complete Point of Sale solution: 0.4s fast checkout, real-time stock sync, foolproof cash shift reconciliation, and deep interactive analytics in one unified platform.",
+  ctaStart: "Sign In to POS",
+  ctaExplore: "Explore Features",
+  stat1Number: "0.4s",
+  stat1Label: "Ultra-Fast Checkout",
+  stat2Number: "100%",
+  stat2Label: "Real-time Stock Accuracy",
+  stat3Number: "6 Levels",
+  stat3Label: "Granular Role Permissions",
+  stat4Number: "Instant",
+  stat4Label: "One-Click Excel Export",
+  liveDemoTitle: "Live System Terminal Simulation",
+  liveShiftStatus: "Shift Status: OPEN",
+  liveShiftCashier: "Somchai (Cashier)",
+  liveSalesToday: "Today's Sales",
+  featuresTitle: "Powerful Capabilities Designed for Growth",
+  featuresSubtitle:
+    "Carefully engineered to solve the real operational challenges of modern cafes, restaurants, and retail stores.",
+  feat1Title: "Smart POS Terminal",
+  feat1Desc:
+    "Barcode scanning, fast search, automated 7% VAT & discounts, with PromptPay QR, Cash, and Card payments.",
+  feat2Title: "Real-Time Stock & Inventory",
+  feat2Desc:
+    "Instant inventory deduction upon checkout, real-time low-stock alerts, out-of-stock badges, and SKU search.",
+  feat3Title: "Shift & Cash Drawer Reconciliation",
+  feat3Desc:
+    "Opening float tracking, end-of-shift physical cash count, variance calculation, and cash leak prevention.",
+  feat4Title: "Staff Roles & Gender Profiles",
+  feat4Desc:
+    "Cashier, Manager, and Admin roles with granular menu permissions and distinct gender profile images.",
+  feat5Title: "MUI Interactive Sales Analytics",
+  feat5Desc:
+    "Multi-dimensional trend charts, net profit margins, payment breakdowns, and top 5 bestsellers.",
+  feat6Title: "Financial Summaries & Excel Export",
+  feat6Desc:
+    "Sales history, receipt re-printing, and comprehensive Excel (.xlsx) financial accounting exports in one click.",
+  workflowTitle: "4 Simple Steps to Seamless Operations",
+  workflowSubtitle:
+    "Intuitive flow designed for both new frontline staff and experienced business owners.",
+  step1Title: "1. Open Shift",
+  step1Desc: "Enter starting cash float in drawer to begin taking orders.",
+  step2Title: "2. Take Orders & Checkout",
+  step2Desc:
+    "Tap menu items, scan barcodes, and settle bills via QR or cash in seconds.",
+  step3Title: "3. Automatic Stock & History Sync",
+  step3Desc:
+    "Inventory adjusts immediately while receipt logs and customer points record.",
+  step4Title: "4. Close Shift & Export Reports",
+  step4Desc:
+    "Count cash, verify reconciliation, and export complete Excel accounting summaries.",
+  readyTitle: "Ready to Transform Your Store Operations?",
+  readySubtitle:
+    "Access Yummy POS directly through your modern web browser. No complex installation required, runs on any device.",
+  getStartedBtn: "Sign In to POS Now",
+  footerDesc: "Next-Generation Point of Sale & Business Management Platform.",
+  allRightsReserved: "All rights reserved.",
+};
