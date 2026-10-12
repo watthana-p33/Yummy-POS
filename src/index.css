@@ -1,0 +1,501 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-primary: var(--theme-primary);
+  --color-primary-hover: var(--theme-primary-hover);
+  --color-primary-light: var(--theme-primary-light);
+  --color-primary-text: var(--theme-primary-text);
+  --color-primary-border: var(--theme-primary-border);
+  --font-sans: var(--app-font-family, 'Prompt', sans-serif);
+}
+
+:root {
+  --app-font-family: 'Prompt', sans-serif;
+  --theme-primary: #5b8a72;
+  --theme-primary-hover: #4d7863;
+  --theme-primary-light: #e8f3ee;
+  --theme-primary-text: #387258;
+  --theme-primary-border: #c9e4d5;
+  --color-primary: var(--theme-primary);
+  --color-primary-hover: var(--theme-primary-hover);
+  --color-primary-light: var(--theme-primary-light);
+  --color-primary-text: var(--theme-primary-text);
+  --color-primary-border: var(--theme-primary-border);
+}
+
+.dark {
+  --theme-primary: #7eb99d;
+  --theme-primary-hover: #6ba388;
+  --theme-primary-light: #273931;
+  --theme-primary-text: #7eb99d;
+  --theme-primary-border: #387258;
+  --color-primary: var(--theme-primary);
+  --color-primary-hover: var(--theme-primary-hover);
+  --color-primary-light: var(--theme-primary-light);
+  --color-primary-text: var(--theme-primary-text);
+  --color-primary-border: var(--theme-primary-border);
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--app-font-family, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Prompt', 'Kanit', sans-serif);
+    background-color: #e6e3da;
+    color: #1e293b;
+    -webkit-font-smoothing: antialiased;
+  }
+  .dark body {
+    background-color: #080911;
+    color: #f8fafc;
+  }
+}
+
+/* ==========================================================================
+   Liquid Design Animations & Glassmorphism (Fluid Blobs & Specular Reflections)
+   ========================================================================== */
+
+/* Morphing Blob 1: Wide sweeping elliptical orbit across the canvas */
+@keyframes blob-morph-1 {
+  0% {
+    border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  25% {
+    border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%;
+    transform: translate3d(220px, -140px, 0) rotate(90deg) scale(1.24);
+  }
+  50% {
+    border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%;
+    transform: translate3d(110px, 180px, 0) rotate(180deg) scale(0.88);
+  }
+  75% {
+    border-radius: 50% 50% 75% 25% / 40% 60% 40% 60%;
+    transform: translate3d(-190px, 90px, 0) rotate(270deg) scale(1.2);
+  }
+  100% {
+    border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+    transform: translate3d(0, 0, 0) rotate(360deg) scale(1);
+  }
+}
+
+/* Morphing Blob 2: Counter-drifting wide floating wave */
+@keyframes blob-morph-2 {
+  0% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  25% {
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+    transform: translate3d(-230px, 160px, 0) rotate(-90deg) scale(1.22);
+  }
+  50% {
+    border-radius: 50% 50% 80% 20% / 40% 70% 30% 60%;
+    transform: translate3d(-90px, -180px, 0) rotate(-180deg) scale(0.84);
+  }
+  75% {
+    border-radius: 70% 30% 40% 60% / 60% 40% 60% 40%;
+    transform: translate3d(210px, -80px, 0) rotate(-270deg) scale(1.26);
+  }
+  100% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    transform: translate3d(0, 0, 0) rotate(-360deg) scale(1);
+  }
+}
+
+/* Morphing Blob 3: Wide diagonal floating drift and organic pulse */
+@keyframes blob-morph-3 {
+  0% {
+    border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  30% {
+    border-radius: 65% 35% 40% 60% / 40% 65% 35% 60%;
+    transform: translate3d(200px, -190px, 0) rotate(110deg) scale(1.28);
+  }
+  60% {
+    border-radius: 35% 65% 60% 40% / 65% 40% 60% 35%;
+    transform: translate3d(-210px, -90px, 0) rotate(220deg) scale(0.82);
+  }
+  80% {
+    border-radius: 55% 45% 65% 35% / 45% 55% 35% 65%;
+    transform: translate3d(-120px, 170px, 0) rotate(300deg) scale(1.18);
+  }
+  100% {
+    border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%;
+    transform: translate3d(0, 0, 0) rotate(360deg) scale(1);
+  }
+}
+
+/* Morphing Blob 4: Wide floating droplet roving across center */
+@keyframes blob-morph-4 {
+  0% {
+    border-radius: 48% 52% 60% 40% / 55% 45% 55% 45%;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  33% {
+    border-radius: 60% 40% 40% 60% / 40% 60% 60% 40%;
+    transform: translate3d(-180px, 190px, 0) rotate(120deg) scale(1.3);
+  }
+  66% {
+    border-radius: 40% 60% 60% 40% / 60% 40% 40% 60%;
+    transform: translate3d(210px, -150px, 0) rotate(240deg) scale(0.8);
+  }
+  100% {
+    border-radius: 48% 52% 60% 40% / 55% 45% 55% 45%;
+    transform: translate3d(0, 0, 0) rotate(360deg) scale(1);
+  }
+}
+
+.animate-blob-1 {
+  animation: blob-morph-1 11s ease-in-out infinite;
+  will-change: transform, border-radius;
+}
+.animate-blob-2 {
+  animation: blob-morph-2 13s ease-in-out infinite;
+  will-change: transform, border-radius;
+}
+.animate-blob-3 {
+  animation: blob-morph-3 10s ease-in-out infinite;
+  will-change: transform, border-radius;
+}
+.animate-blob-4 {
+  animation: blob-morph-4 9s ease-in-out infinite;
+  will-change: transform, border-radius;
+}
+
+@keyframes liquid-drift-1 {
+  0%, 100% { transform: translate(0px, 0px) scale(1) rotate(0deg); }
+  33% { transform: translate(45px, -55px) scale(1.15) rotate(16deg); }
+  66% { transform: translate(-35px, 35px) scale(0.92) rotate(-12deg); }
+}
+
+@keyframes liquid-drift-2 {
+  0%, 100% { transform: translate(0px, 0px) scale(1) rotate(0deg); }
+  33% { transform: translate(-55px, 45px) scale(1.18) rotate(-20deg); }
+  66% { transform: translate(35px, -45px) scale(0.90) rotate(14deg); }
+}
+
+@keyframes liquid-drift-3 {
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  50% { transform: translate(40px, 40px) scale(1.22); }
+}
+
+.animate-liquid-1 {
+  animation: liquid-drift-1 20s ease-in-out infinite;
+}
+.animate-liquid-2 {
+  animation: liquid-drift-2 25s ease-in-out infinite;
+}
+.animate-liquid-3 {
+  animation: liquid-drift-3 18s ease-in-out infinite;
+}
+
+/* Liquid Glass Panels (Header, Sidebar, Modals, Aside Cart) */
+.liquid-glass-panel {
+  background: rgba(255, 255, 255, 0.65) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 
+    0 16px 40px -8px rgba(0, 0, 0, 0.04),
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.9),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.03) !important;
+  border-radius: 12px;
+}
+
+.dark .liquid-glass-panel {
+  background: rgba(14, 17, 26, 0.65) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 
+    0 20px 50px -10px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.22),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Liquid Glass Cards (Product cards, stats, widgets) */
+.liquid-glass-card {
+  background: rgba(255, 255, 255, 0.70) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.55) !important;
+  box-shadow: 
+    0 10px 30px -6px rgba(0, 0, 0, 0.04),
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.95) !important;
+}
+
+.dark .liquid-glass-card {
+  background: rgba(18, 23, 36, 0.65) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 
+    0 16px 36px -8px rgba(0, 0, 0, 0.45),
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 3D Glossy droplet effect for badges */
+.liquid-gloss {
+  overflow: hidden;
+}
+.liquid-gloss:not(.absolute) {
+  position: relative;
+}
+.liquid-gloss::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 100%);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   Centralized Dynamic Theme Color Mappings
+   Connects all existing green color classes directly to the central theme
+   ========================================================================== */
+
+/* Primary Backgrounds */
+.bg-\[\#5b8a72\],
+.bg-\[\#4d7863\] {
+  background-color: var(--theme-primary) !important;
+}
+
+.hover\:bg-\[\#4d7863\]:hover,
+.hover\:bg-\[\#5b8a72\]:hover {
+  background-color: var(--theme-primary-hover) !important;
+}
+
+/* Light / Badge Backgrounds */
+.bg-\[\#e8f3ee\],
+.bg-\[\#eaf4ee\],
+.dark\:bg-\[\#273931\] {
+  background-color: var(--theme-primary-light) !important;
+}
+
+.hover\:bg-\[\#e8f3ee\]:hover,
+.hover\:bg-\[\#eaf4ee\]:hover,
+.hover\:bg-\[\#d1e7dd\]:hover,
+.dark\:hover\:bg-\[\#273931\]:hover {
+  background-color: var(--theme-primary-light) !important;
+}
+
+/* Text Colors */
+.text-\[\#5b8a72\] {
+  color: var(--theme-primary) !important;
+}
+
+.hover\:text-\[\#5b8a72\]:hover {
+  color: var(--theme-primary) !important;
+}
+
+.hover\:text-\[\#4d7863\]:hover {
+  color: var(--theme-primary-hover) !important;
+}
+
+.group:hover .group-hover\:text-\[\#5b8a72\] {
+  color: var(--theme-primary) !important;
+}
+
+.text-\[\#387258\],
+.text-\[\#2c5341\],
+.dark\:text-\[\#7eb99d\] {
+  color: var(--theme-primary-text) !important;
+}
+
+.hover\:text-\[\#387258\]:hover {
+  color: var(--theme-primary-text) !important;
+}
+
+.group:hover .group-hover\:text-\[\#7eb99d\],
+.group:hover .dark\:group-hover\:text-\[\#7eb99d\] {
+  color: var(--theme-primary-text) !important;
+}
+
+/* Borders */
+.border-\[\#5b8a72\] {
+  border-color: var(--theme-primary) !important;
+}
+
+.border-\[\#c9e4d5\],
+.dark\:border-\[\#387258\] {
+  border-color: var(--theme-primary-border) !important;
+}
+
+.hover\:border-\[\#5b8a72\]:hover,
+.hover\:border-\[\#5b8a72\]\/40:hover {
+  border-color: var(--theme-primary) !important;
+}
+
+/* Focus, Rings & Shadows */
+.ring-\[\#5b8a72\] {
+  --tw-ring-color: var(--theme-primary) !important;
+}
+
+.hover\:ring-\[\#5b8a72\]\/40:hover {
+  --tw-ring-color: var(--theme-primary) !important;
+}
+
+.shadow-\[\#5b8a72\]\/20 {
+  --tw-shadow-color: var(--theme-primary) !important;
+}
+
+/* Custom scrollbar for clean UI */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #dcd8d0;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #bab3a7;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-receipt, #printable-receipt * {
+    visibility: visible;
+  }
+  #printable-receipt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 10px;
+  }
+}
+
+/* ==========================================================================
+   MUI Charts Tooltip & Popper Layering (Cohesive Liquid Glass Card Theme)
+   ========================================================================== */
+.MuiChartsTooltip-root {
+  z-index: 99999 !important;
+  pointer-events: none !important;
+}
+
+/* Tooltip Outer Card (Cohesive glass panel containing both caption and table) */
+.MuiChartsTooltip-paper {
+  background: rgba(255, 255, 255, 0.88) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.75) !important;
+  box-shadow: 
+    0 16px 36px -6px rgba(45, 55, 72, 0.12),
+    0 4px 14px -2px rgba(45, 55, 72, 0.06),
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.95) !important;
+  border-radius: 16px !important;
+  padding: 10px 14px !important;
+  color: #1e293b !important;
+  font-family: var(--app-font-family, inherit) !important;
+  min-width: 170px !important;
+}
+
+.dark .MuiChartsTooltip-paper {
+  background: rgba(18, 23, 36, 0.88) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 
+    0 20px 48px -8px rgba(0, 0, 0, 0.65),
+    0 6px 16px rgba(0, 0, 0, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.18) !important;
+  color: #f1f5f9 !important;
+}
+
+/* Inner Table Structure */
+.MuiChartsTooltip-table {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-collapse: collapse !important;
+  width: 100% !important;
+}
+
+/* Caption Header (Time/Date label like "18:00") */
+.MuiChartsTooltip-table caption,
+.MuiChartsTooltip-paper caption {
+  caption-side: top !important;
+  text-align: left !important;
+  font-family: inherit !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  color: var(--theme-primary, #387258) !important;
+  padding: 0 0 6px 0 !important;
+  margin: 0 0 6px 0 !important;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.08) !important;
+  background: transparent !important;
+  display: block !important;
+}
+
+.dark .MuiChartsTooltip-table caption,
+.dark .MuiChartsTooltip-paper caption {
+  color: var(--theme-primary, #7eb99d) !important;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Table Rows & Cells */
+.MuiChartsTooltip-row {
+  padding: 2.5px 0 !important;
+}
+
+.MuiChartsTooltip-cell {
+  font-family: inherit !important;
+  font-size: 12px !important;
+  padding: 3px 0 !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+.MuiChartsTooltip-labelCell {
+  padding-right: 16px !important;
+  font-weight: 500 !important;
+  color: #475569 !important;
+}
+
+.dark .MuiChartsTooltip-labelCell {
+  color: #cbd5e1 !important;
+}
+
+.MuiChartsTooltip-valueCell {
+  font-family: monospace, inherit !important;
+  font-weight: 700 !important;
+  text-align: right !important;
+  color: #0f172a !important;
+}
+
+.dark .MuiChartsTooltip-valueCell {
+  color: #ffffff !important;
+}
+
+.MuiChartsTooltip-markCell {
+  padding-right: 8px !important;
+  vertical-align: middle !important;
+}
+
+.MuiChartsTooltip-mark {
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 3px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) !important;
+}
